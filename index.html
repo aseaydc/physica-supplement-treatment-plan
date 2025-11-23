@@ -651,13 +651,34 @@
                     `;
                     
                     productDiv.onclick = function() {
-                        toggleProduct(product, categoryDiv, productDiv);
+                        const select = productDiv.querySelector('.dosing-select');
+                        if (!select.value) {
+                            alert('Please select a dosing level first.');
+                        }
                     };
                     
                     const select = productDiv.querySelector('.dosing-select');
                     select.onchange = function(e) {
                         e.stopPropagation();
-                        updateProductDosing(product, this.value);
+                        const dosingLevel = this.value;
+                        
+                        if (dosingLevel) {
+                            // Add or update the product
+                            const productId = product.name;
+                            selectedProducts.set(productId, {
+                                ...product,
+                                dosingLevel: dosingLevel,
+                                category: categoryDiv.querySelector('.category-header span:first-child').textContent
+                            });
+                            productDiv.classList.add('selected');
+                        } else {
+                            // Remove the product if dosing is cleared
+                            const productId = product.name;
+                            selectedProducts.delete(productId);
+                            productDiv.classList.remove('selected');
+                        }
+                        
+                        updateSelectedDisplay();
                     };
                     
                     content.appendChild(productDiv);
@@ -692,43 +713,6 @@
                     arrow.textContent = '▼';
                 }
             });
-        }
-
-        function toggleProduct(product, categoryDiv, productDiv) {
-            const select = productDiv.querySelector('.dosing-select');
-            const dosingLevel = select.value;
-            
-            if (!dosingLevel) {
-                alert('Please select a dosing level first.');
-                return;
-            }
-            
-            const productId = product.name;
-            
-            if (selectedProducts.has(productId)) {
-                selectedProducts.delete(productId);
-                productDiv.classList.remove('selected');
-                select.value = '';
-            } else {
-                selectedProducts.set(productId, {
-                    ...product,
-                    dosingLevel: dosingLevel,
-                    category: categoryDiv.querySelector('.category-header span:first-child').textContent
-                });
-                productDiv.classList.add('selected');
-            }
-            
-            updateSelectedDisplay();
-        }
-
-        function updateProductDosing(product, dosingLevel) {
-            const productId = product.name;
-            if (selectedProducts.has(productId)) {
-                const existing = selectedProducts.get(productId);
-                existing.dosingLevel = dosingLevel;
-                selectedProducts.set(productId, existing);
-                updateSelectedDisplay();
-            }
         }
 
         function updateSelectedDisplay() {
@@ -783,7 +767,7 @@
         function removeProduct(productName) {
             selectedProducts.delete(productName);
             
-            // Update UI
+            // Update UI - find the product and reset its dropdown
             const productItems = document.querySelectorAll('.product-item');
             productItems.forEach(item => {
                 if (item.querySelector('.product-name').textContent === productName) {
