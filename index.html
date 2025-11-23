@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physica Energetics - Report of Findings Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 0;
+            min-height: 600px;
+        }
+
+        .products-panel {
+            padding: 30px;
+            border-right: 2px solid #e0e0e0;
+            overflow-y: auto;
+            max-height: calc(100vh - 200px);
+        }
+
+        .category {
+            margin-bottom: 30px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .category-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .category-header:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+
+        .category-content {
+            padding: 15px;
+            background: #f8f9fa;
+            display: none;
+        }
+
+        .category-content.active {
+            display: block;
+        }
+
+        .product-item {
+            background: white;
+            margin-bottom: 10px;
+            padding: 12px;
+            border-radius: 6px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .product-item:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .product-item.selected {
+            background: #e8f0fe;
+            border-color: #1e3c72;
+        }
+
+        .product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .product-name {
+            font-weight: 600;
+            color: #1e3c72;
+        }
+
+        .product-item.selected .product-name {
+            color: #764ba2;
+        }
+
+        .dosing-select {
+            padding: 5px 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            background: white;
+            font-size: 0.9em;
+            cursor: pointer;
+        }
+
+        .selected-panel {
+            background: #f8f9fa;
+            padding: 30px;
+            overflow-y: auto;
+            max-height: calc(100vh - 200px);
+        }
+
+        .selected-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .selected-header h2 {
+            color: #1e3c72;
+        }
+
+        .clear-all {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.3s ease;
+        }
+
+        .clear-all:hover {
+            background: #c82333;
+        }
+
+        .selected-product {
+            background: white;
+            margin-bottom: 12px;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .selected-product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .selected-product-name {
+            font-weight: 600;
+            color: #1e3c72;
+            flex: 1;
+        }
+
+        .remove-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: background 0.3s ease;
+        }
+
+        .remove-btn:hover {
+            background: #c82333;
+        }
+
+        .dosing-info {
+            background: #e8f0fe;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 8px;
+            font-size: 0.9em;
+        }
+
+        .dosing-label {
+            font-weight: 600;
+            color: #764ba2;
+            margin-bottom: 5px;
+        }
+
+        .action-buttons {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .patient-info {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 2px solid #667eea;
+        }
+
+        .patient-info h3 {
+            color: #1e3c72;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 0.95em;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+            position: sticky;
+            top: 0;
+            background: white;
+            padding: 10px 0;
+            z-index: 10;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #667eea;
+            border-radius: 6px;
+            font-size: 1em;
+        }
+
+        .expand-all {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+
+        .expand-all:hover {
+            background: #764ba2;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .container {
+                box-shadow: none;
+            }
+
+            .products-panel,
+            .action-buttons,
+            .patient-info,
+            .clear-all,
+            .remove-btn {
+                display: none !important;
+            }
+
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .selected-panel {
+                max-height: none;
+            }
+        }
+
+        .count-badge {
+            background: #ffc107;
+            color: #1e3c72;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌿 Physica Energetics</h1>
+            <p>Clinical Report of Findings Generator</p>
+        </header>
+
+        <div class="main-content">
+            <div class="products-panel">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="🔍 Search products...">
+                </div>
+                <button class="expand-all" onclick="toggleAllCategories()">Expand/Collapse All</button>
+                
+                <div id="productsContainer"></div>
+            </div>
+
+            <div class="selected-panel">
+                <div class="patient-info">
+                    <h3>Patient Information</h3>
+                    <div class="form-group">
+                        <label>Patient Name:</label>
+                        <input type="text" id="patientName" placeholder="Enter patient name">
+                    </div>
+                    <div class="form-group">
+                        <label>Date:</label>
+                        <input type="date" id="reportDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Clinical Notes:</label>
+                        <textarea id="clinicalNotes" placeholder="Add clinical notes or rationale..."></textarea>
+                    </div>
+                </div>
+
+                <div class="selected-header">
+                    <h2>Selected Products <span class="count-badge" id="productCount">0</span></h2>
+                    <button class="clear-all" onclick="clearAllSelections()">Clear All</button>
+                </div>
+
+                <div id="selectedProducts"></div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="generateReport()">📄 Generate Report</button>
+                    <button class="btn btn-secondary" onclick="window.print()">🖨️ Print Report</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const products = {
+            "Matrix Nutritionals": [
+                {name: "5-HTP Liposome Spray", general: "2-4 sprays 10 mins prior breakfast, lunch & dinner", acute: "4-6 sprays before bed (insomnia)", chronic: "3 sprays 5 mins prior breakfast, lunch & dinner"},
+                {name: "Acetyl L-Carnitine", general: "1 cap 2x daily", acute: "2 caps 3x daily", chronic: "2 caps 2x daily"},
+                {name: "Adrenal LF", general: "2 caps bid (10am, 4pm)", acute: "2 caps bid (10am, 4pm)", chronic: "1 cap qd"},
+                {name: "Alkalize-C Powder", general: "1 tsp 1x daily in water", acute: "2 tsp morning, 2 tsp noon, 2 tsp evening in water", chronic: "1 tsp morning, 1 tsp noon in water"},
+                {name: "ASuRA Brain", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
+                {name: "Baicalin Skullcap (BioPhotonic)", general: "2 capsules daily", acute: "6-8 capsules 2-3x daily", chronic: "4 capsules 2x daily"},
+                {name: "Bio-A Curcumin PhytoNanosome", general: "1 cap breakfast, 1-2 caps dinner", acute: "3 caps tid", chronic: "1 cap breakfast, 6 caps lunch & dinner"},
+                {name: "BioCatalase Plus Lotion", general: "Apply to afflicted area as needed. Keep away from eyes", acute: "Apply to afflicted area as needed. Keep away from eyes", chronic: "Apply to afflicted area as needed. Keep away from eyes"},
+                {name: "BioCell Salts", general: "5 drops 2x daily in warm water", acute: "1 full dropper 6x daily in warm water (3-5 days)", chronic: "1 full dropper 2x daily in warm water"},
+                {name: "BioHealth Matrix", general: "2 caps qd", acute: "2 caps qd", chronic: "2 caps qd"},
+                {name: "Bio-Omega 3", general: "2 caps bid", acute: "3 caps tid", chronic: "3 caps breakfast, 6 caps lunch & dinner"},
+                {name: "Bliss PhytoNanosome", general: "2 caps 1x daily breakfast", acute: "3 caps 1x daily breakfast", chronic: "4 caps 1x daily breakfast"},
+                {name: "Camu Camu Vitamin C Liposome Powder", general: "1 tsp 10 mins prior breakfast, lunch & dinner", acute: "1 tsp before breakfast, 1 cap lunch, 2 caps before bed", chronic: "1 tsp 10 mins prior breakfast, lunch & dinner"},
+                {name: "CataZyme-7", general: "1-2 caps (only use if ulcers are present)", acute: "N/A", chronic: "N/A"},
+                {name: "CataZyme-U", general: "1-2 tablets tid", acute: "N/A", chronic: "N/A"},
+                {name: "Collagen Peptides LF Powder", general: "1 scoop in water/smoothie bid", acute: "N/A", chronic: "N/A"},
+                {name: "CoQ10 Liposome Tincture", general: "60 drops tid", acute: "60 drops ww tid (10am, 4pm)", chronic: "30 drops ww bid"},
+                {name: "DHEA Liposomal Drops", general: "5-10 sprays qd", acute: "10-20+ sprays 1-2x daily", chronic: "10-20 sprays qd"},
+                {name: "DIM Liposome", general: "1 tsp tid", acute: "N/A", chronic: "N/A"},
+                {name: "Flora Syntropy", general: "2 caps 10 mins prior breakfast, lunch & dinner", acute: "3-6 caps qid", chronic: "3-6 caps qid"},
+                {name: "GALT Fortifier", general: "2 caps before breakfast & dinner", acute: "2 caps before breakfast & dinner", chronic: "2 caps before breakfast & dinner"},
+                {name: "GB-40 Yuan Source", general: "1 cap qd", acute: "2 caps breakfast & 4pm", chronic: "2 caps breakfast & 4pm"},
+                {name: "Glutamine Complex PLG-U Powder", general: "1-2 scoops in water/smoothie bid", acute: "1-2 scoops water/smoothie bid (increase 1 cap every 3 days until you achieve 1-3 bowel movements daily)", chronic: "1-2 scoops in water/smoothie bid"},
+                {name: "Glutathione (GSH) Liposome", general: "1-2 tsp tid", acute: "1-2 tsp qd", chronic: "3 sprays bid"},
+                {name: "Glycine Composite", general: "1-2 caps bid", acute: "N/A", chronic: "N/A"},
+                {name: "Green Light Spagyric", general: "60 drops ww tid", acute: "60 drops ww tid (10am, 4pm)", chronic: "30 drops ww bid"},
+                {name: "Green Tea Catechins", general: "1 cap bid", acute: "2 caps 3x daily", chronic: "2 caps 2x daily"},
+                {name: "Gynostemma BioForce (GBF)", general: "1 cap bid breakfast & dinner", acute: "2 caps tid", chronic: "2 caps tid"},
+                {name: "Halcyon", general: "2 caps 1 hour prior bed", acute: "4 caps 1 hour prior bed", chronic: "3 caps 1 hour prior bed"},
+                {name: "HepataGest Powder", general: "1 scoop in water/smoothie bid", acute: "2-3x daily", chronic: "bid"},
+                {name: "Holo-Plexus", general: "2 caps qd", acute: "2 caps tid", chronic: "2 caps bid"},
+                {name: "HPA Axis LF", general: "1 cap qd", acute: "1 cap breakfast, lunch & 4pm", chronic: "1 cap qd"},
+                {name: "Hypo Zymase", general: "1-2 tablets tid", acute: "2 caps tid", chronic: "2 caps bid"},
+                {name: "Inflamma LF", general: "2 caps qid", acute: "6 caps qid", chronic: "3 caps qid"},
+                {name: "Jambola", general: "2 caps prior breakfast, lunch & dinner", acute: "N/A", chronic: "N/A"},
+                {name: "Laminaria", general: "2 caps qid", acute: "3 caps qid", chronic: "2 caps tid"},
+                {name: "L-Arginine SR", general: "1-2 caps breakfast, lunch & dinner, 2-4 caps before bed (vigor)", acute: "2 caps breakfast, lunch & dinner, 2-4 caps before bed (vigor)", chronic: "1 cap breakfast & lunch, 1 cap dinner"},
+                {name: "Lithium-Oro Liposome Composite", general: "3 sprays bid", acute: "6-12 sprays 1-2x daily", chronic: "10-20 sprays qd"},
+                {name: "Magnesium BisGlycinate + L-Taurine", general: "3 caps breakfast & dinner, 1 cap before bed", acute: "3 caps breakfast & 4pm", chronic: "2 caps breakfast, 3 caps before bed"},
+                {name: "Melatonin Liposome Spray", general: "3 sprays 5 mins prior breakfast, lunch & dinner", acute: "10-20 sprays qd", chronic: "6-12 sprays 1-2x daily"},
+                {name: "MetaChlor", general: "2 caps 2-3x daily", acute: "3 caps breakfast, 4 caps lunch & 5 caps dinner (maximum tolerated dose)", chronic: "2 caps tid"},
+                {name: "Methyl-B12 Liposome Spray", general: "6-12 sprays 1-2x daily", acute: "10-20+ sprays qd", chronic: "10-20 sprays qd"},
+                {name: "MetPhos", general: "2 caps tid before meals", acute: "N/A", chronic: "N/A"},
+                {name: "NAC Forte (N-Acetyl L-Cysteine)", general: "1 cap tid", acute: "2 caps breakfast, 1 cap lunch, 2 caps before bed", chronic: "2 caps breakfast, 1 cap lunch, 2 caps dinner"},
+                {name: "Nat Body CLR", general: "3 caps breakfast, 3 caps dinner", acute: "N/A", chronic: "N/A"},
+                {name: "Nat Colon CLR", general: "1-2 caps before bed (increase 1 cap every 3 days until you achieve 1-3 bowel movements daily)", acute: "N/A", chronic: "N/A"},
+                {name: "Omega GOLD", general: "2 caps bid", acute: "N/A", chronic: "N/A"},
+                {name: "Pancrea LF", general: "1 cap qd", acute: "2 caps bid", chronic: "1 cap bid"},
+                {name: "Phyto Antiox", general: "1 cap bid", acute: "2 caps 3x daily", chronic: "2 caps 2x daily"},
+                {name: "Phyto Cal-Mag + Boron", general: "2-4 caps at dinner", acute: "N/A", chronic: "N/A"},
+                {name: "Pregnenolone Liposomal Drops", general: "5-10 sprays qd", acute: "10-20 sprays qd", chronic: "10-20+ sprays 1-2x daily"},
+                {name: "Rejuvan NMN Liposome Composite", general: "3 sprays bid", acute: "6-12 sprays 1-2x daily", chronic: "10-20 sprays qd"},
+                {name: "Saccharomyces boulardii Forte", general: "1 cap before breakfast, 1 cap lunch, 2 caps before bed", acute: "2 caps tid", chronic: "1 cap tid"},
+                {name: "Solray-D3 + K2 Liposome Spray", general: "10-20 sprays qd", acute: "10-20+ sprays qd", chronic: "6+ sprays qd"},
+                {name: "SpectraLyte", general: "15 drops in every liter of water", acute: "20-25 drops in 1oz distilled water, milk, rice dream, etc, tid & following exertion/exercise", chronic: "N/A"},
+                {name: "Spleen LF", general: "2 caps tid", acute: "2 caps tid", chronic: "1 cap tid"},
+                {name: "Symbiome CMF-50B", general: "1 cap before breakfast, 1 cap lunch, 2 caps before bed", acute: "1 cap qd", chronic: "1 cap qd"},
+                {name: "Thymus LF", general: "1 cap breakfast & lunch, 2 caps dinner", acute: "2 caps tid", chronic: "1 cap breakfast & lunch, 3 caps dinner"},
+                {name: "Thyro LF", general: "1 cap qd", acute: "1 cap breakfast & lunch, 2 caps dinner", chronic: "1 cap qd"},
+                {name: "Vita LF Capsules", general: "2 caps qd", acute: "N/A", chronic: "N/A"},
+                {name: "Vita LF Powder", general: "1 scoop qd", acute: "N/A", chronic: "N/A"},
+                {name: "Vitamin B5", general: "1 cap tid", acute: "N/A", chronic: "N/A"},
+                {name: "Vitamin B Coenzyme Complex Liposome", general: "1 tsp bid", acute: "2 tsp 3x daily", chronic: "1-2 tsp 2x daily"},
+                {name: "Wild Bear Garlic", general: "60 drops ww bid", acute: "60 drops ww qid", chronic: "60 drops ww bid"},
+                {name: "Wild Oregano Oil", general: "1 cap breakfast, 2 caps lunch & dinner", acute: "2 caps tid", chronic: "2 caps tid"},
+                {name: "Xeno BioForce", general: "1-2 caps qd", acute: "2 caps 3x daily", chronic: "2 caps 2x daily"},
+                {name: "Zinc-Oro Liposome Composite", general: "3 sprays bid", acute: "10-20+ sprays 1-2x daily", chronic: "6-12 sprays 1-2x daily"}
+            ],
+            "BioPhotonic Botanicals": [
+                {name: "Arjuna Intrinsic", general: "30 drops ww bid", acute: "60 drops ww 2-3x daily", chronic: "30 drops ww 2x daily"},
+                {name: "Artemisia Intrinsic", general: "60 drops ww tid", acute: "In the early stages dose 60 drops ww every waking hour", chronic: "60 drops ww 2-3x daily"},
+                {name: "Berberine Intrinsic", general: "60 drops ww tid", acute: "60 drops ww qid", chronic: "30 drops ww tid"},
+                {name: "Black Radish (Spanish) Intrinsic", general: "60 drops tid", acute: "N/A", chronic: "N/A"},
+                {name: "Borage Intrinsic", general: "30 drops ww tid", acute: "N/A", chronic: "N/A"},
+                {name: "Burdock Intrinsic", general: "30 drops ww tid", acute: "60 drops ww tid", chronic: "30 drops ww tid"},
+                {name: "Carduus Marianus Intrinsic", general: "60 drops tid", acute: "N/A", chronic: "N/A"},
+                {name: "Cat's Claw Intrinsic", general: "60 drops ww tid", acute: "60 drops ww 3-4x daily", chronic: "60 drops ww 2-3x daily"},
+                {name: "Chanca Piedra Intrinsic", general: "30 drops tid", acute: "N/A", chronic: "N/A"},
+                {name: "Cilantro Intrinsic", general: "30 drops ww bid", acute: "60 drops ww 2-3x daily", chronic: "30 drops ww 2x daily"},
+                {name: "Cohosh Intrinsic 114", general: "30 drops ww bid", acute: "N/A", chronic: "N/A"},
+                {name: "Condurango Intrinsic", general: "30 drops tid", acute: "N/A", chronic: "N/A"},
+                {name: "Dandi Intrinsic", general: "30 drops tid", acute: "60 drops tid", chronic: "30 drops 2-3x daily"},
+                {name: "Dong Quai Intrinsic 1428", general: "30 drops ww bid", acute: "N/A", chronic: "N/A"},
+                {name: "Echina Intrinsic", general: "60 drops ww tid", acute: "60 drops ww tid", chronic: "60 drops ww 2x daily"},
+                {name: "Gen Intrinsic", general: "30 drops ww bid", acute: "N/A", chronic: "N/A"},
+                {name: "Ginkgo Intrinsic", general: "30 drops ww bid", acute: "60 drops ww 2-3x daily", chronic: "30 drops ww 2x daily"},
+                {name: "Guggulipid Intrinsic", general: "30 drops ww bid", acute: "N/A", chronic: "N/A"},
+                {name: "Hawthorn Intrinsic", general: "30 drops ww bid", acute: "60 drops ww 2-3x daily", chronic: "30 drops ww 2x daily"},
+                {name: "Hydrangea Intrinsic", general: "60 drops tid", acute: "N/A", chronic: "N/A"},
+                {name: "Juniper Intrinsic", general: "30 drops ww tid", acute: "60 drops ww 2-3x daily", chronic: "30 drops ww 2-3x daily"},
+                {name: "Lapacho Intrinsic", general: "60 drops tid", acute: "60 drops ww 3-4x daily", chronic: "60 drops ww 2-3x daily"},
+                {name: "Licro Intrinsic", general: "30 drops ww tid (10am & 4pm)", acute: "60 drops ww 2-3x daily", chronic: "30 drops ww 2-3x daily"},
+                {name: "Maca Intrinsic", general: "60 drops ww tid", acute: "N/A", chronic: "N/A"},
+                {name: "Mycelia Intrinsic Liposome", general: "120 drops ww tid", acute: "120 drops ww 3-4x daily", chronic: "120 drops ww 2-3x daily"},
+                {name: "Myrrh Intrinsic", general: "30 drops tid", acute: "N/A", chronic: "N/A"},
+                {name: "Olive Leaf Intrinsic", general: "90 drops ww tid", acute: "In the early stages dose 60 drops ww every waking hour", chronic: "60 drops ww 2-3x daily"},
+                {name: "Phyto Lavage Intrinsic", general: "30 drops tid", acute: "N/A", chronic: "N/A"},
+                {name: "Sambucus Intrinsic", general: "30 drops ww bid", acute: "60 drops ww 3-4x daily", chronic: "60 drops ww 2-3x daily"},
+                {name: "Scrofulara Intrinsic", general: "60 drops ww tid", acute: "60 drops ww 3-4x daily", chronic: "30 drops ww 2-3x daily"},
+                {name: "Solidago Intrinsic", general: "60 drops tid", acute: "N/A", chronic: "N/A"},
+                {name: "Spleen Chi", general: "60 drops ww bid", acute: "60 drops ww 3-4x daily", chronic: "30 drops ww 2-3x daily"},
+                {name: "Temple Warrior", general: "60 drops ww bid", acute: "In the early stages dose 60 drops ww every waking hour", chronic: "60 drops ww 2-3x daily"},
+                {name: "Trifolo Intrinsic", general: "60 drops ww tid", acute: "N/A", chronic: "N/A"},
+                {name: "Valerian Intrinsic", general: "30 drops ww before bed", acute: "60 drops ww before bed", chronic: "30 drops ww before bed"}
+            ],
+            "BioToxicosis (Lymphs)": [
+                {name: "Lymph 1 Acute", general: "5 drops 2x daily in warm water, increasing to 1 full dropper 2x daily", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "1 full dropper 3x daily in warm water"},
+                {name: "Lymph 2 Matrix", general: "5 drops 2x daily in warm water, increasing to 1 full dropper 2x daily", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "1 full dropper 3x daily in warm water"},
+                {name: "Lymph 3 Chronic", general: "5 drops 2x daily in warm water, increasing to 1 full dropper 2x daily", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "1 full dropper 3x daily in warm water"}
+            ],
+            "Detoxifiers (Tox's)": [
+                {name: "Aller-Tox I", general: "5 drops 2x daily in warm water, increasing to 1 full dropper 2x daily", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "1 full dropper 3x daily in warm water"},
+                {name: "Aller-Tox II", general: "5 drops 2x daily in warm water, increasing to 1 full dropper 2x daily", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "1 full dropper 3x daily in warm water"},
+                {name: "Amoeba-Tox", general: "5 drops 2x daily in warm water, increasing to 1 full dropper 2x daily", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "1 full dropper 3x daily in warm water"},
+                {name: "Bacteria-Tox", general: "30 drops ww bid", acute: "30 drops ww qid", chronic: "30 drops ww 2-3x daily"},
+                {name: "Can-Tox", general: "5 drops 2x daily in warm water, increasing to 1 full dropper 2x daily", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "1 full dropper 3x daily in warm water"},
+                {name: "Chem-Tox", general: "5 drops 2x daily in warm water, increasing to 1 full dropper 2x daily", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "1 full dropper 3x daily in warm water"},
+                {name: "Colo-Tox", general: "5 drops 2x daily in warm water, increasing to 1 full dropper 2x daily", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "1 full dropper 3x daily in warm water"},
+                {name: "Dental-Tox", general: "5 drops 2x daily in warm water, increasing to 1 full dropper 2x daily", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "1 full dropper 3x daily in warm water"},
+                {name: "Fem-Tox", general: "30 drops qid", acute: "30 drops ww qid", chronic: "30 drops ww 2-3x daily"},
+                {name: "GlycoPan-Tox", general: "5 drops 2x daily in warm water, increasing to 1 full dropper 2x daily", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "1 full dropper 3x daily in warm water"},
+                {name: "GPS-Tox", general: "5 drops 2x daily in warm water, increasing to 1 full dropper 2x daily", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "1 full dropper 3x daily in warm water"},
+                {name: "Gyne-Tox", general: "5 drops 2x daily in warm water, increasing to 1 full dropper 2x daily", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "1 full dropper 3x daily in warm water"},
+                {name: "Hepata-Tox", general: "5 drops 2x daily in warm water, increasing to 1 full dropper 2x daily", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "1 full dropper 3x daily in warm water"},
+                {name: "HZ-Tox", general: "5 drops 2x daily in warm water, increasing to 1 full dropper 2x daily", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "1 full dropper 3x daily in warm water"},
+                {name: "IBD-Tox", general: "5 drops 2x daily in warm water, increasing to 1 full dropper 2x daily", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "1 full dropper 3x daily in warm water"},
+                {name: "Inflamma-Tox", general: "30 drops ww bid", acute: "30 drops ww qid", chronic: "30 drops ww 2-3x daily"},
+                {name: "Lipo-Tox", general: "5 drops 2x daily in warm water, increasing to 1 full dropper 2x daily", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "1 full dropper 3x daily in warm water"},
+                {name: "Metabolic-Tox", general: "30 drops ww bid", acute: "30 drops ww qid", chronic: "30 drops ww 2-3x daily"},
+                {name: "Metal-Tox", general: "5 drops 2x daily in warm water, increasing to 1 full dropper 2x daily", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "1 full dropper 3x daily in warm water"},
+                {name: "Mono-Tox", general: "5 drops 2x daily in warm water, increasing to 1 full dropper 2x daily", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "1 full dropper 3x daily in warm water"},
+                {name: "Myco-Tox", general: "5 drops 2x daily in warm water, increasing to 1 full dropper 2x daily", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "1 full dropper 3x daily in warm water"},
+                {name: "Mycoplasma-Tox", general: "30 drops ww bid", acute: "30 drops ww qid", chronic: "30 drops ww 2-3x daily"},
+                {name: "Neuro-Tox", general: "30 drops ww bid", acute: "30 drops ww qid", chronic: "30 drops ww 2-3x daily"},
+                {name: "Para-Tox", general: "5 drops 2x daily in warm water, increasing to 1 full dropper 2x daily", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "1 full dropper 3x daily in warm water"},
+                {name: "Pesticide-Tox", general: "5 drops 2x daily in warm water, increasing to 1 full dropper 2x daily", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "1 full dropper 3x daily in warm water"},
+                {name: "Pneuma-Tox", general: "5 drops 2x daily in warm water, increasing to 1 full dropper 2x daily", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "1 full dropper 3x daily in warm water"},
+                {name: "Rena-Tox", general: "5 drops 2x daily in warm water, increasing to 1 full dropper 2x daily", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "1 full dropper 3x daily in warm water"},
+                {name: "Sclero-Tox", general: "30 drops ww bid", acute: "30 drops ww qid", chronic: "30 drops ww 2-3x daily"},
+                {name: "Sinus-Tox", general: "5 drops 2x daily in warm water, increasing to 1 full dropper 2x daily", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "1 full dropper 3x daily in warm water"},
+                {name: "Thyro-Tox", general: "5 drops 2x daily in warm water, increasing to 1 full dropper 2x daily", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "1 full dropper 3x daily in warm water"},
+                {name: "Vaccin-Tox", general: "5 drops 2x daily in warm water, increasing to 1 full dropper 2x daily", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "1 full dropper 3x daily in warm water"},
+                {name: "Viru-Tox", general: "5 drops 2x daily in warm water, increasing to 1 full dropper 2x daily", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "1 full dropper 3x daily in warm water"}
+            ],
+            "Drainage Tonifiers (Milieu's)": [
+                {name: "Adrenal Milieu", general: "15 drops ww bid", acute: "15-20 drops ww 3-4x daily", chronic: "10-15 drops ww 2-3x daily"},
+                {name: "Drainage Milieu", general: "15 drops ww bid", acute: "15-20 drops ww 3-4x daily", chronic: "10-15 drops ww 2-3x daily"},
+                {name: "Flu Milieu", general: "15 drops ww bid", acute: "15-20 drops ww 3-4x daily", chronic: "10-15 drops ww 2-3x daily"},
+                {name: "GB Milieu", general: "15 drops ww bid", acute: "15-20 drops ww 3-4x daily", chronic: "10-15 drops ww 2-3x daily"},
+                {name: "Heart's Song Milieu Spray", general: "10 sprays qd", acute: "10-15 sprays 2-3x daily", chronic: "10-20 sprays 1-2x daily"},
+                {name: "Kidney Milieu", general: "15 drops ww bid", acute: "15-20 drops ww 3-4x daily", chronic: "10-15 drops ww 2-3x daily"},
+                {name: "Liver Milieu", general: "15 drops ww bid", acute: "15-20 drops ww 3-4x daily", chronic: "10-15 drops ww 2-3x daily"},
+                {name: "Pre & Post Milieu", general: "15 drops ww bid", acute: "15-20 drops ww 3-4x daily", chronic: "10-15 drops ww 2-3x daily"},
+                {name: "ReHydrate", general: "15 drops in every liter of water", acute: "20-25 drops in 1oz distilled water, milk, rice dream, etc, tid & following exertion/exercise", chronic: "15 drops in every liter of water"},
+                {name: "Relax Milieu", general: "15 drops ww bid", acute: "15-20 drops ww 3-4x daily", chronic: "10-15 drops ww 2-3x daily"},
+                {name: "Solace Milieu", general: "15 drops ww bid", acute: "15-20 drops ww 3-4x daily", chronic: "10-15 drops ww 2-3x daily"},
+                {name: "Throat Spray Milieu", general: "3-5 sprays as needed", acute: "5-8 sprays 3-4x daily", chronic: "3-5 sprays 2-3x daily"}
+            ],
+            "Sarcode Organotherapy (Codes)": [
+                {name: "Adapto Code", general: "30 drops ww bid", acute: "30 drops ww 3-4x daily", chronic: "30 drops ww 2-3x daily"},
+                {name: "Adreno Code", general: "30 drops ww bid", acute: "30 drops ww 3-4x daily", chronic: "30 drops ww 2-3x daily"},
+                {name: "Circulo Code", general: "30 drops tid", acute: "30 drops ww 3-4x daily", chronic: "30 drops ww 2-3x daily"},
+                {name: "Endo Code F", general: "30 drops ww bid", acute: "30 drops ww 3-4x daily", chronic: "30 drops ww 2-3x daily"},
+                {name: "Endo Code M", general: "30 drops ww bid", acute: "30 drops ww 3-4x daily", chronic: "30 drops ww 2-3x daily"},
+                {name: "Hypothal Code", general: "30 drops ww bid", acute: "30 drops ww 3-4x daily", chronic: "30 drops ww 2-3x daily"},
+                {name: "Lympho Code", general: "30 drops ww bid", acute: "30 drops ww 3-4x daily", chronic: "30 drops ww 2-3x daily"},
+                {name: "Pineal Code", general: "30 drops ww bid", acute: "30 drops ww 3-4x daily", chronic: "30 drops ww 2-3x daily"},
+                {name: "PRP53 Code Liposome Spray", general: "3 sprays bid", acute: "3 sprays qid", chronic: "3 sprays tid"},
+                {name: "Rena Code", general: "30 drops ww bid", acute: "30 drops ww 3-4x daily", chronic: "30 drops ww 2-3x daily"},
+                {name: "Thymus Code", general: "30 drops ww bid", acute: "30 drops ww 3-4x daily", chronic: "30 drops ww 2-3x daily"},
+                {name: "Thyro Code", general: "30 drops ww bid", acute: "30 drops ww 3-4x daily", chronic: "30 drops ww 2-3x daily"}
+            ],
+            "Flowers & Phenolics (Ultimates)": [
+                {name: "Ultimate Fields", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 3x daily in warm water"},
+                {name: "Ultimate Rescue", general: "1 full dropper sublingually as needed", acute: "4 full droppers every 15 minutes until resolution", chronic: "2 full droppers 3x daily between meals"},
+                {name: "Ultimate Phenolics", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 3x daily in warm water"}
+            ]
+        };
+
+        let selectedProducts = new Map();
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeProducts();
+            updateSelectedDisplay();
+            document.getElementById('reportDate').valueAsDate = new Date();
+            
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                filterProducts(searchTerm);
+            });
+        });
+
+        function initializeProducts() {
+            const container = document.getElementById('productsContainer');
+            
+            Object.keys(products).forEach(category => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'category';
+                
+                const header = document.createElement('div');
+                header.className = 'category-header';
+                header.innerHTML = `
+                    <span>${category}</span>
+                    <span>▼</span>
+                `;
+                header.onclick = () => toggleCategory(categoryDiv);
+                
+                const content = document.createElement('div');
+                content.className = 'category-content';
+                
+                products[category].forEach(product => {
+                    const productDiv = document.createElement('div');
+                    productDiv.className = 'product-item';
+                    productDiv.dataset.productName = product.name.toLowerCase();
+                    productDiv.dataset.category = category;
+                    
+                    productDiv.innerHTML = `
+                        <div class="product-header">
+                            <span class="product-name">${product.name}</span>
+                            <select class="dosing-select" onclick="event.stopPropagation()">
+                                <option value="">Select Dosing</option>
+                                <option value="general">General</option>
+                                <option value="acute">Acute</option>
+                                <option value="chronic">Chronic</option>
+                            </select>
+                        </div>
+                    `;
+                    
+                    productDiv.onclick = function() {
+                        toggleProduct(product, categoryDiv, productDiv);
+                    };
+                    
+                    const select = productDiv.querySelector('.dosing-select');
+                    select.onchange = function(e) {
+                        e.stopPropagation();
+                        updateProductDosing(product, this.value);
+                    };
+                    
+                    content.appendChild(productDiv);
+                });
+                
+                categoryDiv.appendChild(header);
+                categoryDiv.appendChild(content);
+                container.appendChild(categoryDiv);
+            });
+        }
+
+        function toggleCategory(categoryDiv) {
+            const content = categoryDiv.querySelector('.category-content');
+            const arrow = categoryDiv.querySelector('.category-header span:last-child');
+            content.classList.toggle('active');
+            arrow.textContent = content.classList.contains('active') ? '▲' : '▼';
+        }
+
+        function toggleAllCategories() {
+            const categories = document.querySelectorAll('.category');
+            const firstCategory = categories[0].querySelector('.category-content');
+            const shouldExpand = !firstCategory.classList.contains('active');
+            
+            categories.forEach(cat => {
+                const content = cat.querySelector('.category-content');
+                const arrow = cat.querySelector('.category-header span:last-child');
+                if (shouldExpand) {
+                    content.classList.add('active');
+                    arrow.textContent = '▲';
+                } else {
+                    content.classList.remove('active');
+                    arrow.textContent = '▼';
+                }
+            });
+        }
+
+        function toggleProduct(product, categoryDiv, productDiv) {
+            const select = productDiv.querySelector('.dosing-select');
+            const dosingLevel = select.value;
+            
+            if (!dosingLevel) {
+                alert('Please select a dosing level first.');
+                return;
+            }
+            
+            const productId = product.name;
+            
+            if (selectedProducts.has(productId)) {
+                selectedProducts.delete(productId);
+                productDiv.classList.remove('selected');
+                select.value = '';
+            } else {
+                selectedProducts.set(productId, {
+                    ...product,
+                    dosingLevel: dosingLevel,
+                    category: categoryDiv.querySelector('.category-header span:first-child').textContent
+                });
+                productDiv.classList.add('selected');
+            }
+            
+            updateSelectedDisplay();
+        }
+
+        function updateProductDosing(product, dosingLevel) {
+            const productId = product.name;
+            if (selectedProducts.has(productId)) {
+                const existing = selectedProducts.get(productId);
+                existing.dosingLevel = dosingLevel;
+                selectedProducts.set(productId, existing);
+                updateSelectedDisplay();
+            }
+        }
+
+        function updateSelectedDisplay() {
+            const container = document.getElementById('selectedProducts');
+            const count = document.getElementById('productCount');
+            
+            count.textContent = selectedProducts.size;
+            container.innerHTML = '';
+            
+            if (selectedProducts.size === 0) {
+                container.innerHTML = '<p style="color: #6c757d; text-align: center; padding: 20px;">No products selected. Select products from the left panel.</p>';
+                return;
+            }
+            
+            // Group by category
+            const grouped = {};
+            selectedProducts.forEach((product, name) => {
+                if (!grouped[product.category]) {
+                    grouped[product.category] = [];
+                }
+                grouped[product.category].push({name, ...product});
+            });
+            
+            Object.keys(grouped).sort().forEach(category => {
+                const categoryHeader = document.createElement('div');
+                categoryHeader.style.cssText = 'font-weight: bold; color: #764ba2; margin: 15px 0 10px 0; padding-bottom: 5px; border-bottom: 2px solid #667eea;';
+                categoryHeader.textContent = category;
+                container.appendChild(categoryHeader);
+                
+                grouped[category].sort((a, b) => a.name.localeCompare(b.name)).forEach(product => {
+                    const productDiv = document.createElement('div');
+                    productDiv.className = 'selected-product';
+                    
+                    const dosingText = product[product.dosingLevel] || 'Dosing not available';
+                    
+                    productDiv.innerHTML = `
+                        <div class="selected-product-header">
+                            <div class="selected-product-name">${product.name}</div>
+                            <button class="remove-btn" onclick="removeProduct('${product.name}')">Remove</button>
+                        </div>
+                        <div class="dosing-info">
+                            <div class="dosing-label">${product.dosingLevel.charAt(0).toUpperCase() + product.dosingLevel.slice(1)} Dosing:</div>
+                            <div>${dosingText}</div>
+                        </div>
+                    `;
+                    
+                    container.appendChild(productDiv);
+                });
+            });
+        }
+
+        function removeProduct(productName) {
+            selectedProducts.delete(productName);
+            
+            // Update UI
+            const productItems = document.querySelectorAll('.product-item');
+            productItems.forEach(item => {
+                if (item.querySelector('.product-name').textContent === productName) {
+                    item.classList.remove('selected');
+                    item.querySelector('.dosing-select').value = '';
+                }
+            });
+            
+            updateSelectedDisplay();
+        }
+
+        function clearAllSelections() {
+            if (confirm('Are you sure you want to clear all selections?')) {
+                selectedProducts.clear();
+                
+                document.querySelectorAll('.product-item').forEach(item => {
+                    item.classList.remove('selected');
+                    item.querySelector('.dosing-select').value = '';
+                });
+                
+                updateSelectedDisplay();
+            }
+        }
+
+        function filterProducts(searchTerm) {
+            const products = document.querySelectorAll('.product-item');
+            let visibleCount = 0;
+            
+            products.forEach(product => {
+                const productName = product.dataset.productName;
+                if (productName.includes(searchTerm)) {
+                    product.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    product.style.display = 'none';
+                }
+            });
+            
+            // Show/hide categories based on visible products
+            document.querySelectorAll('.category').forEach(category => {
+                const visibleProducts = category.querySelectorAll('.product-item[style="display: block;"], .product-item:not([style])');
+                if (searchTerm === '' || visibleProducts.length > 0) {
+                    category.style.display = 'block';
+                } else {
+                    category.style.display = 'none';
+                }
+            });
+        }
+
+        function generateReport() {
+            if (selectedProducts.size === 0) {
+                alert('Please select at least one product before generating the report.');
+                return;
+            }
+            
+            const patientName = document.getElementById('patientName').value || 'Patient Name';
+            const reportDate = document.getElementById('reportDate').value || new Date().toISOString().split('T')[0];
+            const clinicalNotes = document.getElementById('clinicalNotes').value || '';
+            
+            // Group by category
+            const grouped = {};
+            selectedProducts.forEach((product, name) => {
+                if (!grouped[product.category]) {
+                    grouped[product.category] = [];
+                }
+                grouped[product.category].push({name, ...product});
+            });
+            
+            let reportHTML = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Physica Energetics Report of Findings - ${patientName}</title>
+    <style>
+        @page {
+            margin: 1in;
+        }
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 8.5in;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #1e3c72;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #1e3c72;
+            font-size: 28pt;
+            margin-bottom: 10px;
+        }
+        .header h2 {
+            color: #764ba2;
+            font-size: 18pt;
+            font-weight: normal;
+        }
+        .patient-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+            margin-bottom: 30px;
+        }
+        .patient-info table {
+            width: 100%;
+        }
+        .patient-info td {
+            padding: 5px 10px;
+        }
+        .patient-info td:first-child {
+            font-weight: bold;
+            width: 150px;
+        }
+        .category-section {
+            margin-bottom: 30px;
+            page-break-inside: avoid;
+        }
+        .category-title {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 12px 15px;
+            font-size: 14pt;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .product {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            background: white;
+            page-break-inside: avoid;
+        }
+        .product-name {
+            font-size: 12pt;
+            font-weight: bold;
+            color: #1e3c72;
+            margin-bottom: 8px;
+        }
+        .dosing-section {
+            background: #e8f0fe;
+            padding: 10px;
+            border-left: 3px solid #667eea;
+        }
+        .dosing-label {
+            font-weight: bold;
+            color: #764ba2;
+            margin-bottom: 5px;
+        }
+        .notes-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border: 2px solid #667eea;
+            page-break-inside: avoid;
+        }
+        .notes-section h3 {
+            color: #1e3c72;
+            margin-top: 0;
+        }
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+            text-align: center;
+            font-size: 10pt;
+            color: #6c757d;
+        }
+        .print-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .print-btn:hover {
+            background: #764ba2;
+        }
+        @media print {
+            body {
+                padding: 0;
+            }
+            .print-btn {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="print-btn" onclick="window.print()">🖨️ Print Report</button>
+    
+    <div class="header">
+        <h1>🌿 Physica Energetics</h1>
+        <h2>Report of Findings</h2>
+    </div>
+    
+    <div class="patient-info">
+        <table>
+            <tr>
+                <td>Patient Name:</td>
+                <td>${patientName}</td>
+            </tr>
+            <tr>
+                <td>Report Date:</td>
+                <td>${new Date(reportDate).toLocaleDateString()}</td>
+            </tr>
+            <tr>
+                <td>Total Products:</td>
+                <td>${selectedProducts.size}</td>
+            </tr>
+        </table>
+    </div>
+`;
+            
+            // Add products by category
+            Object.keys(grouped).sort().forEach(category => {
+                reportHTML += `
+    <div class="category-section">
+        <div class="category-title">${category}</div>
+`;
+                
+                grouped[category].sort((a, b) => a.name.localeCompare(b.name)).forEach(product => {
+                    const dosingText = product[product.dosingLevel] || 'Dosing not available';
+                    
+                    reportHTML += `
+        <div class="product">
+            <div class="product-name">${product.name}</div>
+            <div class="dosing-section">
+                <div class="dosing-label">${product.dosingLevel.charAt(0).toUpperCase() + product.dosingLevel.slice(1)} Dosing Protocol:</div>
+                <div>${dosingText}</div>
+            </div>
+        </div>
+`;
+                });
+                
+                reportHTML += `    </div>
+`;
+            });
+            
+            // Add clinical notes if present
+            if (clinicalNotes) {
+                reportHTML += `
+    <div class="notes-section">
+        <h3>Clinical Notes & Rationale</h3>
+        <p style="white-space: pre-wrap;">${clinicalNotes}</p>
+    </div>
+`;
+            }
+            
+            reportHTML += `
+    <div class="footer">
+        <p><strong>Disclaimer:</strong> Limited to licensed Healing Arts Professionals for experimental research purposes only. 
+        Not for public distribution. This report is not meant to diagnose, treat, or replace conventional medical treatment.</p>
+        <p>© Physica Energetics - Clinical Protocol Generated ${new Date().toLocaleDateString()}</p>
+    </div>
+</body>
+</html>`;
+            
+            // Create blob and download
+            const blob = new Blob([reportHTML], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Physica-Report-${patientName.replace(/\s+/g, '-')}-${reportDate}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert('✅ Report generated successfully! The file has been downloaded. Open it in your browser to view and print.');
+        }
+    </script>
+</body>
+</html>
