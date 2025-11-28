@@ -540,10 +540,10 @@
                             </select>
                             <select class="phase-select" onchange="handlePhaseChange(this, '${category}', '${product.name}')">
                                 <option value="">Select Phase</option>
-                                <option value="phase1">Phase 1 - Foundation/Drainage</option>
-                                <option value="phase2">Phase 2 - Biofilm</option>
-                                <option value="phase3">Phase 3 - Antimicrobial</option>
-                                <option value="phase4">Phase 4 - Restore</option>
+                                <option value="phase1">Phase 1</option>
+                                <option value="phase2">Phase 2</option>
+                                <option value="phase3">Phase 3</option>
+                                <option value="phase4">Phase 4</option>
                             </select>
                         </div>
                     `;
@@ -644,10 +644,10 @@
             Object.keys(byPhase).forEach(phase => {
                 if (byPhase[phase].length > 0) {
                     const phaseLabel = {
-                        phase1: 'Phase 1 - Foundation/Drainage',
-                        phase2: 'Phase 2 - Biofilm',
-                        phase3: 'Phase 3 - Antimicrobial',
-                        phase4: 'Phase 4 - Restore'
+                        phase1: 'Phase 1',
+                        phase2: 'Phase 2',
+                        phase3: 'Phase 3',
+                        phase4: 'Phase 4'
                     }[phase];
 
                     const phaseHeader = document.createElement('h3');
@@ -725,10 +725,10 @@
             Object.keys(byPhase).forEach(phase => {
                 if (byPhase[phase].length > 0) {
                     const phaseLabel = {
-                        phase1: 'Phase 1 - Foundation & Drainage',
-                        phase2: 'Phase 2 - Biofilm Disruption',
-                        phase3: 'Phase 3 - Antimicrobial Therapy',
-                        phase4: 'Phase 4 - Restoration & Maintenance'
+                        phase1: 'Phase 1',
+                        phase2: 'Phase 2',
+                        phase3: 'Phase 3',
+                        phase4: 'Phase 4'
                     }[phase];
 
                     const phaseColor = {
