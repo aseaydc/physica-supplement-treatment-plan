@@ -3,15 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Supplement Recommendations by Root Health</title>
+    <title>Gut Zoomer (Vibrant Wellness) Protocol Generator - Root Health</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
             padding: 20px;
+            line-height: 1.6;
         }
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -20,780 +26,1459 @@
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             overflow: hidden;
         }
+
         .header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background: linear-gradient(135deg, #2E7D32 0%, #66BB6A 100%);
             color: white;
-            padding: 30px 40px;
+            padding: 40px;
             text-align: center;
         }
-        .logo-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 15px;
-        }
-        .logo {
-            width: 200px;
-            height: auto;
-        }
+
         .header h1 {
-            font-size: 2.2em;
-            margin-bottom: 8px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
         }
+
         .header p {
-            font-size: 1.05em;
-            opacity: 0.9;
-            margin: 5px 0;
+            font-size: 1.2em;
+            opacity: 0.95;
         }
-        .main-content {
-            display: grid;
-            grid-template-columns: 3fr 2fr;
-            gap: 30px;
+
+        .content {
             padding: 40px;
         }
-        .product-panel {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 30px;
-            max-height: 700px;
-            overflow-y: auto;
-        }
-        .selected-panel {
-            background: #e8f5e9;
-            border-radius: 15px;
-            padding: 30px;
-            max-height: 700px;
-            overflow-y: auto;
-        }
+
         .patient-info {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 2px solid #2E7D32;
+        }
+
+        .patient-info h2 {
+            color: #2E7D32;
             margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            font-size: 1.8em;
         }
-        .patient-info h3 {
-            color: #1e3c72;
-            margin-bottom: 12px;
-            font-size: 1.1em;
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
         }
-        .form-group { margin-bottom: 12px; }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: #555;
-            font-weight: 500;
-        }
-        .form-group input, .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            font-family: inherit;
-            font-size: 14px;
-        }
-        .form-group input:focus, .form-group textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        .category {
-            background: white;
-            margin-bottom: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-        .category-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px 20px;
-            cursor: pointer;
+
+        .info-field {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background 0.3s;
+            flex-direction: column;
         }
-        .category-header:hover {
-            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-        }
-        .category-header h3 {
-            font-size: 1.1em;
-        }
-        .toggle-icon {
-            font-size: 1.2em;
-            transition: transform 0.3s;
-        }
-        .toggle-icon.rotated {
-            transform: rotate(180deg);
-        }
-        .category-content {
-            display: none;
-            padding: 20px;
-            background: #fafafa;
-        }
-        .category-content.active {
-            display: block;
-        }
-        .product-item {
-            background: white;
-            padding: 15px;
-            margin-bottom: 12px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-            transition: all 0.3s;
-            cursor: pointer;
-            border-left: 4px solid transparent;
-        }
-        .product-item:hover {
-            transform: translateX(5px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            border-left-color: #667eea;
-        }
-        .product-item.selected {
-            background: #e3f2fd;
-            border-left-color: #2196f3;
-        }
-        .product-name {
+
+        .info-field label {
             font-weight: 600;
-            color: #1e3c72;
-            margin-bottom: 5px;
+            color: #2E7D32;
+            margin-bottom: 8px;
         }
-        .dosing-controls {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin-top: 10px;
-        }
-        .dosing-controls select {
-            flex: 1;
-            padding: 8px;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            font-size: 14px;
-        }
-        .search-box {
-            width: 100%;
+
+        .info-field input {
             padding: 12px;
-            margin-bottom: 20px;
             border: 2px solid #ddd;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 1em;
         }
-        .search-box:focus {
-            outline: none;
-            border-color: #667eea;
+
+        .section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border-left: 5px solid #2E7D32;
         }
-        .selected-item {
-            background: white;
-            padding: 15px;
+
+        .section h3 {
+            color: #2E7D32;
             margin-bottom: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            border-left: 5px solid;
+            font-size: 1.4em;
         }
-        .selected-item.phase1 { border-left-color: #4caf50; }
-        .selected-item.phase2 { border-left-color: #2196f3; }
-        .selected-item.phase3 { border-left-color: #ff9800; }
-        .selected-item.phase4 { border-left-color: #9c27b0; }
-        .selected-item-header {
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-item {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
-        }
-        .selected-item-name {
-            font-weight: 600;
-            color: #1e3c72;
-            font-size: 1.05em;
-        }
-        .remove-btn {
-            background: #f44336;
-            color: white;
-            border: none;
-            padding: 5px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9em;
-        }
-        .remove-btn:hover {
-            background: #d32f2f;
-        }
-        .dosing-info {
-            background: #f5f5f5;
             padding: 10px;
-            border-radius: 5px;
-            margin-top: 8px;
+            background: white;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s;
+        }
+
+        .checkbox-item:hover {
+            border-color: #2E7D32;
+            background: #f0f7f0;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .checkbox-item label {
+            cursor: pointer;
             font-size: 0.95em;
         }
-        .phase-badge {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 12px;
-            font-size: 0.85em;
-            font-weight: 600;
+
+        .generate-btn {
+            background: linear-gradient(135deg, #2E7D32 0%, #66BB6A 100%);
             color: white;
-            margin-right: 8px;
+            padding: 18px 40px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(46, 125, 50, 0.4);
+            transition: all 0.3s;
+            display: block;
+            margin: 30px auto;
+            font-weight: 600;
         }
-        .phase-badge.phase1 { background: #4caf50; }
-        .phase-badge.phase2 { background: #2196f3; }
-        .phase-badge.phase3 { background: #ff9800; }
-        .phase-badge.phase4 { background: #9c27b0; }
-        .notes-section {
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(46, 125, 50, 0.6);
+        }
+
+        .protocol-output {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .phase-container {
             background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 3px solid #2E7D32;
+        }
+
+        .phase-header {
+            background: linear-gradient(135deg, #2E7D32 0%, #66BB6A 100%);
+            color: white;
             padding: 20px;
             border-radius: 10px;
-            margin-top: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
         }
-        .notes-section h3 {
-            color: #1e3c72;
-            margin-bottom: 10px;
+
+        .phase-header h2 {
+            font-size: 1.8em;
+            margin-bottom: 5px;
         }
-        .notes-section textarea {
-            width: 100%;
-            min-height: 100px;
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            font-family: inherit;
-            resize: vertical;
+
+        .phase-header p {
+            opacity: 0.95;
+            font-size: 1.1em;
         }
-        .action-buttons {
+
+        .product-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 5px solid #66BB6A;
+        }
+
+        .product-header {
             display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .product-name {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #2E7D32;
+        }
+
+        .product-price-badge {
+            background: #2E7D32;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .product-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .detail-item {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #000; font-weight: bold;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            color: #2E7D32;
+            font-weight: 600;
+        }
+
+        .product-indication {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 3px solid #2E7D32;
+        }
+
+        .product-indication strong {
+            color: #2E7D32;
+        }
+
+        .pricing-breakdown {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #2E7D32;
+        }
+
+        .pricing-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .pricing-row:last-child {
+            border-bottom: none;
+            font-weight: 700;
+            font-size: 1.1em;
+            color: #2E7D32;
+            padding-top: 12px;
+            border-top: 2px solid #2E7D32;
+        }
+
+        .phase-summary {
+            background: linear-gradient(135deg, #f0f7f0 0%, #e8f5e9 100%);
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 25px;
+            border: 3px solid #2E7D32;
+        }
+
+        .phase-summary h3 {
+            color: #2E7D32;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .summary-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .summary-label {
+            font-size: 0.9em;
+            color: #000; font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .summary-value {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #2E7D32;
+        }
+
+        .grand-total {
+            background: linear-gradient(135deg, #2E7D32 0%, #66BB6A 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .grand-total h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .total-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
             margin-top: 20px;
         }
-        .btn {
-            flex: 1;
-            padding: 15px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.05em;
-            font-weight: 600;
+
+        .total-item {
+            background: rgba(255,255,255,0.2);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .total-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .total-value {
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+
+        .print-btn {
+            background: white;
+            color: #2E7D32;
+            padding: 15px 30px;
+            border: 3px solid white;
+            border-radius: 50px;
             cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-top: 20px;
             transition: all 0.3s;
         }
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+        .print-btn:hover {
+            background: #2E7D32;
             color: white;
         }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-        .btn-secondary {
-            background: #f5f5f5;
-            color: #333;
-        }
-        .btn-secondary:hover {
-            background: #e0e0e0;
-        }
+
         @media print {
-            body { background: white; padding: 0; }
-            .container { box-shadow: none; border-radius: 0; }
-            .main-content { display: block; }
-            .product-panel { display: none; }
-            .action-buttons { display: none; }
-            .selected-panel { max-height: none; }
-            @page { margin: 0.75in; }
+        .protocol-output {
+            display: block !important;
+        }
+        .header {
+            background: white !important;
+            color: #2E7D32 !important;
+            page-break-after: avoid;
+        }
+        .logo-img {
+            height: 80px !important;
+            margin-bottom: 10px !important;
+        }
+        .phase-container {
+            page-break-inside: avoid;
+            background: white !important;
+            border: 2px solid #000 !important;
+        }
+        h3 {
+            color: #000 !important;
+        }
+        .patient-info, .marker-selection {
+            border: 1px solid #000 !important;
+        }
+    }
+            }
+            .header {
+                background: white !important;
+                color: #2E7D32 !important;
+                page-break-after: avoid;
+            }
+            .phase-container {
+                page-break-inside: avoid;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-                        <div class="logo-container">
-                <img src="data:image/png;base64,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" alt="Root Health Logo" class="logo">
+            <div style="text-align: center;">
+                <img src="data:image/png;base64,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" alt="Root Health" style="height: 200px; width: auto; margin-bottom: 15px;" class="logo-img">
+                <h1 style="margin: 0;">Gut Zoomer Protocol Generator</h1>
             </div>
-            <h1>Supplement Recommendations</h1>
-            <p class="subtitle">powered by Physica Energetics</p>
         </div>
 
-        <div class="main-content">
-            <div class="product-panel">
-                <div class="patient-info">
-                    <h3>Patient Information</h3>
-                    <div class="form-group">
+        <div class="content">
+            <div class="patient-info">
+                <h2>Patient Information</h2>
+                <div class="info-grid">
+                    <div class="info-field">
                         <label>Patient Name:</label>
                         <input type="text" id="patientName" placeholder="Enter patient name">
                     </div>
-                    <div class="form-group">
-                        <label>Date:</label>
+                    <div class="info-field">
+                        <label>Date of Birth:</label>
+                        <input type="date" id="patientDOB">
+                    </div>
+                    <div class="info-field">
+                        <label>Test Date:</label>
+                        <input type="date" id="testDate">
+                    </div>
+                    <div class="info-field">
+                        <label>Protocol Date:</label>
                         <input type="date" id="protocolDate">
                     </div>
                 </div>
-
-                <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search products...">
-
-                <div id="categories"></div>
             </div>
 
-            <div class="selected-panel">
-                <h2 style="color: #1e3c72; margin-bottom: 20px;">Selected Products</h2>
-                <div id="selectedProducts"></div>
-
-                <div class="notes-section">
-                    <h3>Clinical Notes</h3>
-                    <textarea id="clinicalNotes" placeholder="Add any clinical notes, observations, or special instructions..."></textarea>
-                </div>
-
-                <div class="action-buttons">
-                    <button class="btn btn-primary" onclick="generateReport()">Generate Report</button>
-                    <button class="btn btn-secondary" onclick="clearAll()">Clear All</button>
-                </div>
+            <div class="section">
+                <h3>🦠 Pathogenic Bacteria (28)</h3>
+                <div class="checkbox-group" id="pathogenicBacteria"></div>
             </div>
+
+            <div class="section">
+                <h3>🌱 Commensal (Beneficial) Bacteria (129)</h3>
+                <div class="checkbox-group" id="commensalBacteria"></div>
+            </div>
+
+            <div class="section">
+                <h3>🦠 Protozoans (14)</h3>
+                <div class="checkbox-group" id="protozoans"></div>
+            </div>
+
+            <div class="section">
+                <h3>🪱 Helminths/Worms (15)</h3>
+                <div class="checkbox-group" id="helminths"></div>
+            </div>
+
+            <div class="section">
+                <h3>🍄 Fungi (6)</h3>
+                <div class="checkbox-group" id="fungi"></div>
+            </div>
+
+            <div class="section">
+                <h3>🦠 Viruses (13)</h3>
+                <div class="checkbox-group" id="viruses"></div>
+            </div>
+
+            <div class="section">
+                <h3>🔥 Inflammatory Markers</h3>
+                <div class="checkbox-group" id="inflammatory"></div>
+            </div>
+
+            <div class="section">
+                <h3>💊 Digestive Function & Malabsorption</h3>
+                <div class="checkbox-group" id="digestive"></div>
+            </div>
+
+            <div class="section">
+                <h3>🛡️ Intestinal Permeability & Antibodies</h3>
+                <div class="checkbox-group" id="permeability"></div>
+            </div>
+
+            <div class="section">
+                <h3>🧪 Bile Acids (10)</h3>
+                <div class="checkbox-group" id="bileAcids"></div>
+            </div>
+
+            <div class="section">
+                <h3>⚡ Short Chain Fatty Acids - SCFA (10)</h3>
+                <div class="checkbox-group" id="scfa"></div>
+            </div>
+
+            <div class="section">
+                <h3>🔬 Gut Metabolites (2)</h3>
+                <div class="checkbox-group" id="metabolites"></div>
+            </div>
+
+            <div class="section">
+                <h3>📊 Diversity Indices (8)</h3>
+                <div class="checkbox-group" id="diversity"></div>
+            </div>
+
+            <div class="section">
+                <h3>🦠 Gut Phyla (14)</h3>
+                <div class="checkbox-group" id="phyla"></div>
+            </div>
+
+            <button class="generate-btn" onclick="generateProtocol()">Generate Complete Protocol</button>
+
+            <div class="protocol-output" id="protocolOutput"></div>
         </div>
     </div>
 
     <script>
-        const products = {
-            "Matrix Nutritionals": [
-                {name: "5-HTP Liposome Spray", general: "2 sprays sublingually 2x daily", acute: "8 sprays sublingually 3x daily", chronic: "4 sprays sublingually 3x daily"},
-                {name: "Acetyl L-Carnitine", general: "2 capsules 2x daily", acute: "6 capsules 3x daily", chronic: "3 capsules 3x daily"},
-                {name: "Adrenal LF", general: "2 capsules 2x daily", acute: "4 capsules 3x daily", chronic: "2 capsules 3x daily"},
-                {name: "Alkalize-C Powder", general: "1 teaspoon in water 2x daily", acute: "2 teaspoons in water 3x daily", chronic: "1 teaspoon in water 3x daily"},
-                {name: "ASuRA Brain", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Baicalin Skullcap", general: "2 capsules daily", acute: "6-8 capsules 2-3x daily", chronic: "4 capsules 2x daily"},
-                {name: "Bio-A Curcumin PhytoNanosome", general: "1 capsule 2x daily", acute: "3 capsules 3x daily", chronic: "2 capsules 3x daily"},
-                {name: "BioCatalase Plus Lotion", general: "Apply topically 2x daily", acute: "Apply topically 4x daily", chronic: "Apply topically 3x daily"},
-                {name: "BioCell Salts", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "BioHealth Matrix", general: "2 capsules 2x daily", acute: "3 capsules 3x daily", chronic: "2 capsules 3x daily"},
-                {name: "Bio-Omega 3", general: "2 soft gels daily", acute: "3 soft gels 3x daily", chronic: "2 soft gels 2x daily"},
-                {name: "Bliss PhytoNanosome", general: "2 capsules (AM) 1 capsule (PM) daily", acute: "4 capsules (AM) 4 capsules (PM) daily", chronic: "2 capsules 3x daily"},
-                {name: "Camu Camu Vitamin C Liposome Powder", general: "1 scoop in water 1x daily", acute: "2-3 scoops in water 3x daily", chronic: "2 scoops in water 1x daily"},
-                {name: "CataZyme-7", general: "1-3 capsules 2x daily with meals", acute: "3-6 capsules 2x daily with meals", chronic: "3 capsules 2x daily with meals"},
-                {name: "CataZyme-U", general: "1-3 capsules 2x daily with meals", acute: "3-6 capsules 2x daily with meals", chronic: "3 capsules 2x daily with meals"},
-                {name: "Collagen Peptides LF Powder", general: "1 scoop daily in beverage", acute: "2 scoops 2x daily in beverage", chronic: "1 scoop 2x daily in beverage"},
-                {name: "CoQ10 Liposome Tincture", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 3x daily in warm water", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "DHEA Liposomal Drops", general: "5 drops sublingually 1x daily", acute: "10 drops sublingually 2x daily", chronic: "8 drops sublingually 1x daily"},
-                {name: "DIM Liposome", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 3x daily in warm water", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Flora Syntropy", general: "1-2 capsules 3x daily just before meals", acute: "6 capsules 3x daily between meals", chronic: "3 capsules 3x daily just before meals"},
-                {name: "GALT Fortifier", general: "1-3 capsules daily between meals", acute: "3-6 capsules 2x daily between meals", chronic: "3 capsules 2x daily between meals"},
-                {name: "GB-40 Yuan Source", general: "2 capsules (AM) 2 capsules (PM) daily", acute: "4 capsules (AM) 4 capsules (PM) daily", chronic: "2 capsules 3x daily"},
-                {name: "Glutamine Complex PLG-U Powder", general: "1 level scoop 1x daily", acute: "2 level scoops 3x daily", chronic: "1 level scoop 3x daily"},
-                {name: "Glutathione (GSH) Liposome", general: "1 teaspoon sublingually daily on empty stomach", acute: "2 teaspoons sublingually 3x daily on empty stomach", chronic: "1 teaspoon sublingually 3x daily on empty stomach"},
-                {name: "Glycine Composite", general: "2 capsules daily", acute: "3-6 capsules 2x daily", chronic: "3 capsules 2x daily"},
-                {name: "Green Light Spagyric", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 3x daily in warm water"},
-                {name: "Green Tea Catechins", general: "1 capsule 3x daily", acute: "6 capsules 3x daily", chronic: "3 capsules 3x daily"},
-                {name: "Gynostemma BioForce (GBF)", general: "1-2 capsules daily", acute: "3 capsules 3x daily", chronic: "2 capsules 2x daily"},
-                {name: "Halcyon", general: "2 capsules (AM) 2 capsules (PM) daily", acute: "4 capsules (AM) 4 capsules (PM) daily", chronic: "2 capsules 3x daily"},
-                {name: "HepataGest Powder", general: "1 scoop 1x daily", acute: "2 scoops 3x daily", chronic: "1 scoop 2x daily"},
-                {name: "Holo-Plexus", general: "2 capsules daily", acute: "4 capsules 2x daily", chronic: "2 capsules 2x daily"},
-                {name: "HPA Axis LF", general: "2 capsules daily", acute: "6 capsules 2x daily", chronic: "4 capsules 2x daily"},
-                {name: "Hypo Zymase", general: "2 capsules 2x daily with meals", acute: "4 capsules 3x daily with meals", chronic: "3 capsules 2x daily with meals"},
-                {name: "Inflamma LF", general: "2 capsules 2x daily", acute: "4 capsules 3x daily", chronic: "3 capsules 2x daily"},
-                {name: "Jambola", general: "2 capsules 2x daily", acute: "4 capsules 3x daily", chronic: "2 capsules 3x daily"},
-                {name: "Laminaria", general: "2 capsules 2x daily", acute: "6-12 capsules 2x daily", chronic: "4 capsules 2x daily"},
-                {name: "L-Arginine SR", general: "1 tablet 3x daily", acute: "4 tablets 3x daily", chronic: "2 tablets 3x daily"},
-                {name: "Lithium-Oro Liposome Composite", general: "1 capsule 2x daily", acute: "4 capsules 2x daily", chronic: "2 capsules 2x daily"},
-                {name: "Magnesium BisGlycinate + L-Taurine", general: "3 capsules 2x daily", acute: "6 capsules 3x daily", chronic: "6 capsules 2x daily"},
-                {name: "Melatonin Liposome Spray", general: "3 sprays sublingually 30 min before bedtime", acute: "6-12 sprays sublingually 30 min before bedtime", chronic: "6 sprays sublingually 30 min before bedtime"},
-                {name: "MetaChlor", general: "10 drops 2x daily in water", acute: "20 drops 3x daily in water", chronic: "15 drops 2x daily in water"},
-                {name: "Methyl-B12 Liposome Spray", general: "2 sprays sublingually 2x daily", acute: "6 sprays sublingually 3x daily", chronic: "4 sprays sublingually 2x daily"},
-                {name: "MetPhos", general: "15-30 drops 2x daily in water", acute: "30-60 drops 2x daily in water", chronic: "20-40 drops 2x daily in water"},
-                {name: "NAC Forte (N-Acetyl L-Cysteine)", general: "1 capsule 2x daily", acute: "6 capsules 3x daily", chronic: "3 capsules 2x daily"},
-                {name: "Nat Body CLR", general: "1-3 capsules 2x daily", acute: "6 capsules 3x daily", chronic: "3 capsules 3x daily"},
-                {name: "Nat Colon CLR", general: "1 capsule 1x daily just before bedtime", acute: "3 capsules 3x daily just before bedtime", chronic: "2 capsules 2x daily just before bedtime"},
-                {name: "Omega GOLD", general: "2 soft gels daily", acute: "3 soft gels 3x daily", chronic: "2 soft gels 2x daily"},
-                {name: "Pancrea LF", general: "2 capsules 2x daily with meals", acute: "4 capsules 3x daily with meals", chronic: "3 capsules 2x daily with meals"},
-                {name: "Phyto Antiox", general: "1-2 capsules 2x daily", acute: "3 capsules 3x daily", chronic: "2 capsules 3x daily"},
-                {name: "Phyto Cal-Mag + Boron", general: "3 capsules 2x daily", acute: "6 capsules 3x daily", chronic: "4 capsules 2x daily"},
-                {name: "Pregnenolone Liposomal Drops", general: "5 drops sublingually 1x daily", acute: "10 drops sublingually 2x daily", chronic: "8 drops sublingually 1x daily"},
-                {name: "Rejuvan NMN Liposome Composite", general: "1 capsule 2x daily", acute: "3 capsules 3x daily", chronic: "2 capsules 2x daily"},
-                {name: "Saccharomyces boulardii Forte", general: "1 capsule 2x daily", acute: "3 capsules 3x daily", chronic: "2 capsules 3x daily"},
-                {name: "Solray-D3 + K2 Liposome Spray", general: "4 sprays sublingually 1x daily", acute: "8 sprays sublingually 2x daily", chronic: "6 sprays sublingually 1x daily"},
-                {name: "SpectraLyte", general: "1 full dropper 2x daily in water", acute: "2 full droppers 3x daily in water", chronic: "2 full droppers 2x daily in water"},
-                {name: "Spleen LF", general: "2 capsules 2x daily", acute: "4 capsules 3x daily", chronic: "2 capsules 3x daily"},
-                {name: "Symbiome CMF-50B", general: "1 capsule 2x daily", acute: "2 capsules 3x daily", chronic: "1 capsule 3x daily"},
-                {name: "Thymus LF", general: "2 capsules 2x daily", acute: "4 capsules 3x daily", chronic: "2 capsules 3x daily"},
-                {name: "Thyro LF", general: "2 capsules 2x daily", acute: "4 capsules 3x daily", chronic: "2 capsules 3x daily"},
-                {name: "Vita LF Capsules", general: "3 capsules 2x daily", acute: "6 capsules 3x daily", chronic: "4 capsules 2x daily"},
-                {name: "Vita LF Powder", general: "1 scoop 2x daily", acute: "2 scoops 3x daily", chronic: "1 scoop 3x daily"},
-                {name: "Vitamin B5", general: "2 capsules daily", acute: "3 capsules 3x daily", chronic: "2 capsules 2x daily"},
-                {name: "Vitamin B Coenzyme Complex Liposome", general: "2 full droppers daily", acute: "3 full droppers 3x daily", chronic: "2 full droppers 2x daily"},
-                {name: "Wild Bear Garlic", general: "2 capsules 2x daily", acute: "4 capsules 3x daily", chronic: "3 capsules 2x daily"},
-                {name: "Wild Oregano Oil", general: "1-2 capsules 2x daily", acute: "3 capsules 3x daily", chronic: "2 capsules 3x daily"},
-                {name: "Xeno BioForce", general: "2 capsules 2x daily", acute: "4 capsules 3x daily", chronic: "2 capsules 3x daily"},
-                {name: "Zinc-Oro Liposome Composite", general: "1 capsule 2x daily", acute: "3 capsules 3x daily", chronic: "2 capsules 3x daily"}
-            ],
-            "BioPhotonic Botanicals (Intrinsics)": [
-                {name: "Arjuna Intrinsic", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Berberine Intrinsic", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Black Cumin Intrinsic", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Boswellia Intrinsic", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Camu Camu Intrinsic", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Neem Intrinsic", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Olive Leaf Intrinsic", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Pau d'Arco Intrinsic", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Sarsaparilla Intrinsic", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Turmeric Intrinsic", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"}
-            ],
-            "BioToxicosis (Lymph Drainage)": [
-                {name: "Lymph 1 Acute", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Lymph 2 Matrix", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Lymph 3 Chronic", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"}
-            ],
-            "Detoxifier Homaccords": [
-                {name: "Aller-Tox I", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Aller-Tox II", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Bacteria-Tox", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Can-Tox", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Chem-Tox", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Colo-Tox", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Dental-Tox", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Fem-Tox", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "GlycoPan-Tox", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "GPS-Tox", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Gyne-Tox", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Hepata-Tox", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "HZ-Tox", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "IBD-Tox", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Inflamma-Tox", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Lipo-Tox", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Metabolic-Tox", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Metal-Tox", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Mono-Tox", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Myco-Tox", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Mycoplasma-Tox", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Neuro-Tox", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Para-Tox", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Pesticide-Tox", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Pneuma-Tox", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Rena-Tox", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Sclero-Tox", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Sinus-Tox", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Thyro-Tox", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Vaccin-Tox", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Viru-Tox", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"}
-            ],
-            "Drainage Tonifiers (Milieus)": [
-                {name: "Adrenal Milieu", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Drainage Milieu", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Flu Milieu", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "GB Milieu", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Heart's Song Milieu Spray", general: "2 sprays sublingually 2x daily", acute: "2 sprays sublingually 6x daily", chronic: "2 sprays sublingually 3x daily"},
-                {name: "Kidney Milieu", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Liver Milieu", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Pre & Post Milieu", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "ReHydrate", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Relax Milieu", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Solace Milieu", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Throat Spray Milieu", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"}
-            ],
-            "Sarcode Organotherapy (Codes)": [
-                {name: "Adapto Code", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Adreno Code", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Circulo Code", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Endo Code F", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Endo Code M", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Hypothal Code", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Lympho Code", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Pineal Code", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "PRP53 Code Liposome Spray", general: "3 sprays sublingually 2x daily", acute: "8 sprays sublingually 3x daily", chronic: "6 sprays sublingually 2x daily"},
-                {name: "Rena Code", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Thymus Code", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"},
-                {name: "Thyro Code", general: "1 full dropper 2x daily in warm water", acute: "2 full droppers 6x daily in warm water (3-5 days)", chronic: "2 full droppers 2x daily in warm water"}
-            ]
-        };
+// ============================================
+// PHYSICA PRICING DATABASE WITH NC TAX
+// ============================================
 
-        let selectedProducts = [];
+const NC_TAX_RATE = 0.0725;
 
-        function initializeApp() {
-            document.getElementById('protocolDate').valueAsDate = new Date();
-            renderCategories();
-            renderSelectedProducts();
-            document.getElementById('searchBox').addEventListener('input', handleSearch);
+const PHYSICA_PRODUCTS = {
+    // Detoxifiers
+    "Para-Tox": { price: 30.00, form: "tincture", size: "2 oz", droppers: 60 },
+    "Bacteria-Tox": { price: 30.00, form: "tincture", size: "2 oz", droppers: 60 },
+    "Can-Tox": { price: 30.00, form: "tincture", size: "2 oz", droppers: 60 },
+    "Viru-Tox": { price: 30.00, form: "tincture", size: "2 oz", droppers: 60 },
+    "IBD-Tox": { price: 30.00, form: "tincture", size: "2 oz", droppers: 60 },
+    "Inflamma-Tox": { price: 30.00, form: "tincture", size: "2 oz", droppers: 60 },
+    "Myco-Tox": { price: 30.00, form: "tincture", size: "2 oz", droppers: 60 },
+    "Hepata-Tox": { price: 30.00, form: "tincture", size: "2 oz", droppers: 60 },
+    "Inflamma-Tox": { price: 30.00, form: "tincture", size: "2 oz", droppers: 60 },
+    
+    // Lymph Drainage
+    "Lymph 1 ACUTE": { price: 34.00, form: "tincture", size: "2 oz", droppers: 60 },
+    "Lymph 2 MATRIX": { price: 34.00, form: "tincture", size: "2 oz", droppers: 60 },
+    "Lymph 3 CHRONIC": { price: 34.00, form: "tincture", size: "2 oz", droppers: 60 },
+    
+    // Drainage Milieu
+    "Drainage Milieu": { price: 34.00, form: "tincture", size: "2 oz", droppers: 60 },
+    
+    // BioPhotonic Botanicals
+    "Artemisia Intrinsic": { price: 32.00, form: "tincture", size: "2 oz", droppers: 60 },
+    "Lapacho Intrinsic": { price: 33.60, form: "tincture", size: "2 oz", droppers: 60 },
+    "Berberine Intrinsic": { price: 32.00, form: "tincture", size: "2 oz", droppers: 60 },
+    "Olive Leaf Intrinsic": { price: 33.92, form: "tincture", size: "2 oz", droppers: 60 },
+    "Wild Oregano Oil": { price: 40.69, form: "liquid", size: "1 oz", droppers: 30 },
+    "Wild Bear Garlic": { price: 47.28, form: "capsules", size: "90 caps", capsules: 90 },
+    "Baicalin Skullcap": { price: 35.96, form: "capsules", size: "90 caps", capsules: 90 },
+    
+    // Matrix Nutritionals
+    "SpectraLyte": { price: 45.22, form: "powder", size: "4 oz", servings: 30 },
+    "GALT Fortifier": { price: 61.80, form: "capsules", size: "90 caps", capsules: 90 },
+    "Bio-A Curcumin PhytoNanosome": { price: 48.00, form: "capsules", size: "60 caps", capsules: 60 },
+    "Inflamma LF": { price: 58.00, form: "capsules", size: "60 caps", capsules: 60 },
+    "HepataGest Powder": { price: 89.90, form: "powder", size: "510g", servings: 30 },
+    "GB-40 Yuan Source": { price: 41.28, form: "capsules", size: "60 caps", capsules: 60 },
+    "Hypo Zymase": { price: 36.05, form: "capsules", size: "90 caps", capsules: 90 },
+    "Methyl-B12 Liposome Spray": { price: 49.34, form: "spray", size: "2 oz", sprays: 375 },
+    "Glutamine PLG-U Powder": { price: 63.16, form: "powder", size: "255g", servings: 30 },
+    "Glycine Composite": { price: 42.24, form: "capsules", size: "90 caps", capsules: 90 },
+    "MetaChlor": { price: 47.28, form: "capsules", size: "60 caps", capsules: 60 },
+    "Symbiome CMF-50B": { price: 61.80, form: "capsules", size: "30 caps", capsules: 30 },
+    "Saccharomyces boulardii Forte": { price: 38.12, form: "capsules", size: "60 caps", capsules: 60 },
+    "Flora Syntropy": { price: 61.80, form: "capsules", size: "90 caps", capsules: 90 }
+};
+
+// Calculate days supply
+function calculateDaysSupply(product, dosing) {
+    const productData = PHYSICA_PRODUCTS[product];
+    if (!productData) return 30;
+    
+    if (productData.form === "tincture") {
+        const droppersPerDay = dosing.perDay || 2;
+        return Math.floor(productData.droppers / droppersPerDay);
+    } else if (productData.form === "capsules") {
+        const capsPerDay = dosing.perDay || 2;
+        return Math.floor(productData.capsules / capsPerDay);
+    } else if (productData.form === "spray") {
+        const spraysPerDay = dosing.spraysPerDay || dosing.perDay || 5;
+        return Math.floor(productData.sprays / spraysPerDay);
+    } else if (productData.form === "powder") {
+        const servingsPerDay = dosing.perDay || 1;
+        return Math.floor(productData.servings / servingsPerDay);
+    }
+    return 30;
+}
+
+function calculateBottlesNeeded(daysSupply, phaseDuration = 28) {
+    return Math.ceil(phaseDuration / daysSupply);
+}
+
+function calculatePricing(product, bottlesNeeded) {
+    const productData = PHYSICA_PRODUCTS[product];
+    if (!productData) return { subtotal: 0, tax: 0, total: 0 };
+    
+    const subtotal = productData.price * bottlesNeeded;
+    const tax = subtotal * NC_TAX_RATE;
+    const total = subtotal + tax;
+    
+    return {
+        pricePerBottle: productData.price,
+        subtotal: subtotal,
+        tax: tax,
+        total: total
+    };
+}
+
+// ============================================
+// GUT ZOOMER MARKERS (VIBRANT WELLNESS)
+// ============================================
+
+const PATHOGENIC_BACTERIA = [
+    "Aeromonas spp.",
+    "Bacillus cereus",
+    "Campylobacter coli",
+    "Campylobacter jejuni",
+    "Campylobacter spp.",
+    "Campylobacter upsaliensis",
+    "Clostridium difficile",
+    "Clostridium difficile Toxin A",
+    "Clostridium difficile Toxin B",
+    "Clostridium perfringens",
+    "E. coli O157",
+    "Edwardsiella tarda",
+    "Enteroaggregative E. coli (EAEC)",
+    "Enteropathogenic E. coli (EPEC)",
+    "Enterotoxigenic E. coli (ETEC) LT/ST",
+    "Helicobacter pylori",
+    "Klebsiella pneumoniae",
+    "Listeria",
+    "Non-pylori Helicobacter spp.",
+    "Plesiomonas shigelloides",
+    "Salmonella",
+    "Shiga-like toxin-producing E. coli (STEC) Stx1/Stx2",
+    "Shigella/EIEC",
+    "Staphylococcus aureus",
+    "Vibrio cholerae",
+    "Vibrio parahaemolyticus",
+    "Vibrio vulnificus",
+    "Yersinia enterocolitica"
+];
+
+const COMMENSAL_BACTERIA = [
+    "Acinetobacter",
+    "Actinomyces",
+    "Akkermansia muciniphila",
+    "Alistipes",
+    "Alloprevotella",
+    "Atopobium",
+    "Atopobium parvulum",
+    "Bacillus coagulans",
+    "Bacillus subtilis",
+    "Bacteroidales",
+    "Bacteroides",
+    "Bacteroides caccae",
+    "Bacteroides vulgatus",
+    "Bacteroidetes",
+    "Bifidobacterium",
+    "Bifidobacterium adolescentis",
+    "Bifidobacterium animalis",
+    "Bifidobacterium animalis subspecies lactis",
+    "Bifidobacterium bifidum",
+    "Bifidobacterium breve",
+    "Bifidobacterium catenulatum",
+    "Bifidobacterium dentium",
+    "Bifidobacterium infantis",
+    "Bifidobacterium lactis",
+    "Bifidobacterium longum",
+    "Blautia",
+    "Blautia hydrogenotrophica",
+    "Blautia obeum",
+    "Bradyrhizobiaceae",
+    "Butyricimonas",
+    "Butyrivibrio",
+    "Catenibacterium",
+    "Christensenella minuta",
+    "Clostridia cluster IV",
+    "Clostridia cluster XIVa",
+    "Clostridia cluster XVIII",
+    "Clostridiales Family XIV incertae sedis",
+    "Clostridiales incertae sedis IV",
+    "Clostridium",
+    "Clostridium hathewayi",
+    "Clostridium ramosum",
+    "Clostridium species",
+    "Clostridium spp.",
+    "Clostridium symbiosum",
+    "Collinsella",
+    "Coprococcus",
+    "Desulfovibrio",
+    "Desulfovibrio piger",
+    "Dialister invisus",
+    "Dorea",
+    "Eggerthella lenta",
+    "Enterobacteria",
+    "Enterobacteriaceae",
+    "Enterococcus",
+    "Enterococcus gallinarum",
+    "Enterococcus species",
+    "Enterococcus spp.",
+    "Escherichia coli",
+    "Escherichia coli nissle",
+    "Eubacterium",
+    "Eubacterium rectale",
+    "Eubacterium spp.",
+    "Faecalibacterium",
+    "Faecalibacterium prausnitzii",
+    "Fusobacterium",
+    "Haemophilus",
+    "Hafnia",
+    "Holdemania",
+    "Klebsiella aerogenes",
+    "Lachnospiraceae",
+    "Lactobacillaceae",
+    "Lactobacillus",
+    "Lactobacillus acidophilus",
+    "Lactobacillus animalis",
+    "Lactobacillus brevis",
+    "Lactobacillus bulgaricus",
+    "Lactobacillus casei",
+    "Lactobacillus fermentum",
+    "Lactobacillus paracasei",
+    "Lactobacillus plantarum",
+    "Lactobacillus reuteri",
+    "Lactobacillus rhamnosus",
+    "Lactobacillus rhamnosus GG",
+    "Lactobacillus ruminis",
+    "Lactobacillus sakei",
+    "Lactobacillus salivarius",
+    "Lactobacillus spp.",
+    "Lactococcus",
+    "Leuconostoc",
+    "Marvinbryantia",
+    "Methanobrevibacter smithii",
+    "Mycoplana",
+    "Oscillospira",
+    "Parabacteroides",
+    "Pediococcus",
+    "Peptostreptococcus species",
+    "Phascolarctobacterium",
+    "Porphyromonas gingivalis",
+    "Prevotella",
+    "Prevotella copri",
+    "Propionibacterium freudenreichi",
+    "Proteus mirabilis",
+    "Pseudobutyrivibrio",
+    "Pseudomonas",
+    "Roseburia",
+    "Roseburia intestinalis",
+    "Ruminococcaceae",
+    "Ruminococcus",
+    "Ruminococcus bromii",
+    "Ruminococcus gnavus",
+    "Ruminococcus spp.",
+    "Saccharomyces boulardii",
+    "Solobacterium moorei",
+    "Staphylococcaceae",
+    "Staphylococcus",
+    "Staphylococcus epidermidis",
+    "Staphylococcus pasteuri",
+    "Staphylococcus species",
+    "Streptococci",
+    "Streptococcus",
+    "Streptococcus species",
+    "Streptococcus spp.",
+    "Streptococcus thermophilus",
+    "Tyzzerella",
+    "Tyzzerella 4",
+    "Veillonella",
+    "Veillonellaceae",
+    "β-galactosidase producing bacteria",
+    "β-glucuronidase producing bacteria"
+];
+
+
+const PROTOZOANS = [
+    "Balantidium coli",
+    "Blastocystis hominis",
+    "Chilomastix mesnili",
+    "Cryptosporidium",
+    "Cyclospora cayetanensis",
+    "Cyclospora spp.",
+    "Dientamoeba fragilis",
+    "Endolimax nana",
+    "Entamoeba coli",
+    "Entamoeba histolytica",
+    "Giardia lamblia",
+    "Isospora belli",
+    "Pentatrichomonas hominis",
+    "Trichomonas hominis"
+];
+
+const HELMINTHS = [
+    "Ancylostoma duodenale",
+    "Ascaris lumbricoides",
+    "Diphyllobothrium latum",
+    "Dipylidium caninum",
+    "Enterobius vermicularis",
+    "Fasciola/Fasciolopsis",
+    "Hymenolepis",
+    "Larval nematode",
+    "Mansonella",
+    "Necator americanus",
+    "Schistosoma",
+    "Strongyloides stercoralis",
+    "Taenia solium",
+    "Taenia spp.",
+    "Trichuris trichiura"
+];
+
+const FUNGI = [
+    "Candida albicans",
+    "Candida glabrata",
+    "Candida spp.",
+    "Geotrichum spp.",
+    "Microsporidium spp.",
+    "Rodotorula spp."
+];
+
+const VIRUSES = [
+    "Adenovirus F40/41",
+    "Astrovirus",
+    "Cytomegalovirus",
+    "Enterovirus",
+    "Epstein Barr virus",
+    "Human Bocavirus",
+    "Norovirus GI Virus",
+    "Norovirus GII Virus",
+    "Rotavirus A",
+    "Sapovirus I",
+    "Sapovirus II",
+    "Sapovirus IV",
+    "Sapovirus V"
+];
+
+const INFLAMMATORY = [
+    "Beta defensin 2 (HIGH)",
+    "Calprotectin (HIGH)",
+    "Fecal Eosinophil Protein X (HIGH)",
+    "Fecal lactoferrin (HIGH)",
+    "Lysozyme (HIGH)",
+    "MMP 9 (HIGH)",
+    "S100A12 (HIGH)"
+];
+
+const DIGESTIVE = [
+    "Pancreatic elastase 1 (LOW)",
+    "Meat fiber (HIGH)",
+    "Vegetable fiber (HIGH)",
+    "Total Fecal Fat (HIGH)",
+    "Total Fecal Triglycerides (HIGH)",
+    "Long chain fatty acids (HIGH)",
+    "Total Cholesterol (HIGH)",
+    "Total Phospholipids (HIGH)",
+    "β-glucuronidase (HIGH)"
+];
+
+const PERMEABILITY = [
+    "Fecal Zonulin (HIGH)",
+    "Tissue transglutaminase (tTg) antibody (POSITIVE)",
+    "Deamidated gliadin peptide (DGP) antibody (POSITIVE)",
+    "Fecal Anti Gliadin (HIGH)",
+    "Actin antibody (POSITIVE)",
+    "Lipopolysaccharide (LPS) antibody (HIGH)",
+    "Anti-Saccharomyces cerevisiae antibody (ASCA) (POSITIVE)",
+    "Secretory IgA (LOW)",
+    "Secretory IgA (HIGH)"
+];
+
+const BILE_ACIDS = [
+    "Cholic acid (CA) (LOW)",
+    "Cholic acid (CA) (HIGH)",
+    "Chenodeoxycholic acid (CDCA) (LOW)",
+    "Chenodeoxycholic acid (CDCA) (HIGH)",
+    "Deoxycholic acid (DCA) (LOW)",
+    "Deoxycholic acid (DCA) (HIGH)",
+    "Lithocholic acid (LCA) (LOW)",
+    "Lithocholic acid (LCA) (HIGH)",
+    "LCA/DCA ratio (LOW)",
+    "LCA/DCA ratio (HIGH)"
+];
+
+const SHORT_CHAIN_FATTY_ACIDS = [
+    "Acetate (LOW)",
+    "Acetate (HIGH)",
+    "Butyrate (LOW)",
+    "Butyrate (HIGH)",
+    "Propionate (LOW)",
+    "Propionate (HIGH)",
+    "Valerate (LOW)",
+    "Valerate (HIGH)",
+    "Total Short chain fatty acids (LOW)",
+    "Total Short chain fatty acids (HIGH)"
+];
+
+const GUT_METABOLITES = [
+    "β-glucuronidase (LOW)",
+    "β-glucuronidase (HIGH)"
+];
+
+const DIVERSITY_INDICES = [
+    "Shannon's Diversity Index (LOW)",
+    "Shannon's Diversity Index (HIGH)",
+    "Simpson's Diversity Index (LOW)",
+    "Simpson's Diversity Index (HIGH)",
+    "Firmicutes/Bacteroidetes ratio (LOW)",
+    "Firmicutes/Bacteroidetes ratio (HIGH)",
+    "Prevotella/Bacteroidetes (P/B) ratio (LOW)",
+    "Prevotella/Bacteroidetes (P/B) ratio (HIGH)"
+];
+
+const GUT_PHYLA = [
+    "Proteobacteria (LOW)",
+    "Proteobacteria (HIGH)",
+    "Actinobacteria (LOW)",
+    "Actinobacteria (HIGH)",
+    "Fusobacteria (LOW)",
+    "Fusobacteria (HIGH)",
+    "Bacteroidetes (LOW)",
+    "Bacteroidetes (HIGH)",
+    "Firmicutes (LOW)",
+    "Firmicutes (HIGH)",
+    "Euryarchaeota (LOW)",
+    "Euryarchaeota (HIGH)",
+    "Verrucomicrobia (LOW)",
+    "Verrucomicrobia (HIGH)"
+];
+
+// ============================================
+// INITIALIZE CHECKBOXES
+// ============================================
+
+function initializeCheckboxes() {
+    createCheckboxes('pathogenicBacteria', PATHOGENIC_BACTERIA);
+    createCheckboxes('commensalBacteria', COMMENSAL_BACTERIA);
+    createCheckboxes('protozoans', PROTOZOANS);
+    createCheckboxes('helminths', HELMINTHS);
+    createCheckboxes('fungi', FUNGI);
+    createCheckboxes('viruses', VIRUSES);
+    createCheckboxes('inflammatory', INFLAMMATORY);
+    createCheckboxes('digestive', DIGESTIVE);
+    createCheckboxes('permeability', PERMEABILITY);
+    createCheckboxes('bileAcids', BILE_ACIDS);
+    createCheckboxes('scfa', SHORT_CHAIN_FATTY_ACIDS);
+    createCheckboxes('metabolites', GUT_METABOLITES);
+    createCheckboxes('diversity', DIVERSITY_INDICES);
+    createCheckboxes('phyla', GUT_PHYLA);
+}
+
+function createCheckboxes(containerId, items) {
+    const container = document.getElementById(containerId);
+    items.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'checkbox-item';
+        div.innerHTML = `
+            <input type="checkbox" id="${containerId}_${index}" value="${item}">
+            <label for="${containerId}_${index}">${item}</label>
+        `;
+        container.appendChild(div);
+    });
+}
+
+// ============================================
+// PROTOCOL GENERATION
+// ============================================
+
+function generateProtocol() {
+    const selected = gatherSelectedMarkers();
+    const protocol = buildProtocol(selected);
+    displayProtocol(protocol);
+}
+
+function gatherSelectedMarkers() {
+    const selected = {
+        pathogenicBacteria: [],
+        commensalBacteria: [],
+        protozoans: [],
+        helminths: [],
+        fungi: [],
+        viruses: [],
+        inflammatory: [],
+        digestive: [],
+        permeability: [],
+        bileAcids: [],
+        scfa: [],
+        metabolites: [],
+        diversity: [],
+        phyla: []
+    };
+    
+    ['pathogenicBacteria', 'commensalBacteria', 'protozoans', 'helminths', 'fungi', 'viruses', 
+     'inflammatory', 'digestive', 'permeability', 'bileAcids', 'scfa', 'metabolites', 
+     'diversity', 'phyla'].forEach(category => {
+        const checkboxes = document.querySelectorAll(`#${category} input:checked`);
+        checkboxes.forEach(cb => selected[category].push(cb.value));
+    });
+    
+    return selected;
+}
+
+function buildProtocol(selected) {
+    const protocol = {
+        phase1: [],
+        phase2: [],
+        phase3: []
+    };
+    
+    protocol.phase1 = buildPhase1(selected);
+    protocol.phase2 = buildPhase2(selected, protocol.phase1);
+    protocol.phase3 = buildPhase3(selected);
+    
+    return protocol;
+}
+
+function buildPhase1(selected) {
+    const products = [];
+    
+    // Count total pathogens
+    const parasiteCount = selected.protozoans.length + selected.helminths.length;
+    const totalPathology = selected.pathogenicBacteria.length + parasiteCount + 
+                          selected.fungi.length + selected.viruses.length;
+    const inflammationLevel = selected.inflammatory.length;
+    
+    // DRAINAGE - REQUIRED (1-2 products max)
+    if (totalPathology >= 5 || inflammationLevel >= 4) {
+        products.push({
+            name: "Lymph 3 CHRONIC",
+            dosing: { text: "1 dropper 2x daily", perDay: 2 },
+            indication: "Severe ECM congestion - longstanding conditions with deep pathology"
+        });
+        products.push({
+            name: "Drainage Milieu",
+            dosing: { text: "1 dropper 2x daily", perDay: 2 },
+            indication: "Mesenchymal drainage for biofilm disruption"
+        });
+    } else if (totalPathology >= 3 || inflammationLevel >= 2) {
+        products.push({
+            name: "Lymph 2 MATRIX",
+            dosing: { text: "1 dropper 2x daily", perDay: 2 },
+            indication: "Moderate ECM congestion - chronic inflammation and biofilm"
+        });
+    } else {
+        products.push({
+            name: "Lymph 1 ACUTE",
+            dosing: { text: "1 dropper 2x daily", perDay: 2 },
+            indication: "Initial inflammation and mild ECM congestion"
+        });
+    }
+    
+    // CORE SUPPORT (2 products)
+    products.push({
+        name: "SpectraLyte",
+        dosing: { text: "1 tsp 2-3x daily in water", perDay: 2 },
+        indication: "Electrolyte replacement during detoxification"
+    });
+    
+    products.push({
+        name: "Methyl-B12 Liposome Spray",
+        dosing: { text: "2-3 sprays 2x daily sublingually", spraysPerDay: 5 },
+        indication: "Methylation pathway support - critical for detox"
+    });
+    
+    // INFLAMMATION + IMMUNE (Choose ONE combination based on severity)
+    if (inflammationLevel >= 4) {
+        // SEVERE: Homeopathic + Curcumin ONLY
+        products.push({
+            name: "IBD-Tox",
+            dosing: { text: "2 droppers 2x daily in warm water", perDay: 4 },
+            indication: "Homeopathic for IBD/colitis - severe inflammation"
+        });
+        products.push({
+            name: "Bio-A Curcumin PhytoNanosome",
+            dosing: { text: "2 caps 2x daily", perDay: 4 },
+            indication: "Curcumin - downregulates COX-2 and NF-kB inflammation"
+        });
+    } else if (inflammationLevel >= 2) {
+        // MODERATE: Immune + Curcumin
+        products.push({
+            name: "GALT Fortifier",
+            dosing: { text: "3 caps daily between meals", perDay: 3 },
+            indication: "Gut immune support with colostrum and beta-glucans"
+        });
+        products.push({
+            name: "Bio-A Curcumin PhytoNanosome",
+            dosing: { text: "2 caps 2x daily", perDay: 4 },
+            indication: "Curcumin - anti-inflammatory support"
+        });
+    } else if (inflammationLevel >= 1) {
+        // MILD: Just GALT Fortifier OR Inflamma-Tox
+        products.push({
+            name: "GALT Fortifier",
+            dosing: { text: "3 caps daily between meals", perDay: 3 },
+            indication: "Gut immune and anti-inflammatory support"
+        });
+    }
+    
+    // DIGESTIVE SUPPORT (Choose ONE if needed)
+    if (selected.digestive.length >= 3) {
+        // Severe digestive issues - GB-40 covers both bile AND enzymes
+        products.push({
+            name: "GB-40 Yuan Source",
+            dosing: { text: "2 caps 2x daily between meals", perDay: 4 },
+            indication: "Bile flow, gallbladder support, AND pancreatic enzymes"
+        });
+    } else if (selected.digestive.length >= 1) {
+        // Mild-moderate - HepataGest has liver support built in
+        products.push({
+            name: "HepataGest Powder",
+            dosing: { text: "1 scoop 2x daily in juice or water", perDay: 2 },
+            indication: "Liver/gallbladder/digestive support with complete nutrition"
+        });
+    }
+    
+    return products;
+}
+
+function buildPhase2(selected, phase1Products) {
+    const products = [];
+    
+    // Count pathogen types
+    const parasiteCount = selected.protozoans.length + selected.helminths.length;
+    const pathogenTypes = [
+        parasiteCount > 0,
+        selected.fungi.length > 0,
+        selected.pathogenicBacteria.length > 0,
+        selected.viruses.length > 0
+    ].filter(Boolean).length;
+    
+    // DRAINAGE - Only if severe (3+ pathogen types)
+    if (pathogenTypes >= 3) {
+        const drainageProduct = phase1Products.find(p => p.name.includes("Lymph"));
+        if (drainageProduct) {
+            products.push(drainageProduct);
         }
+    }
+    
+    // PARASITES - Tox always, botanical only if ≥3
+    if (parasiteCount > 0) {
+        products.push({
+            name: "Para-Tox",
+            dosing: { text: "1 dropper 2x daily", perDay: 2 },
+            indication: "Homeopathic parasite detoxification - ADJUNCT (die-off support)"
+        });
+        if (parasiteCount >= 3) {
+            products.push({
+                name: "Artemisia Intrinsic",
+                dosing: { text: "1 dropper 3x daily", perDay: 3 },
+                indication: "PRIMARY antiparasitic botanical (wormwood)"
+            });
+        }
+    }
+    
+    // FUNGI - Tox always, botanical only if ≥2
+    if (selected.fungi.length > 0) {
+        products.push({
+            name: "Can-Tox",
+            dosing: { text: "1 dropper 2x daily", perDay: 2 },
+            indication: "Homeopathic candida/yeast detoxification - ADJUNCT (die-off support)"
+        });
+        if (selected.fungi.length >= 2) {
+            products.push({
+                name: "Lapacho Intrinsic",
+                dosing: { text: "1 dropper 2x daily", perDay: 2 },
+                indication: "PRIMARY antifungal botanical (pau d'arco)"
+            });
+        }
+    }
+    
+    // BACTERIA - Tox always, botanical only if ≥3
+    if (selected.pathogenicBacteria.length > 0) {
+        products.push({
+            name: "Bacteria-Tox",
+            dosing: { text: "1 dropper 2x daily", perDay: 2 },
+            indication: "Homeopathic bacterial detoxification - ADJUNCT (die-off support)"
+        });
+        if (selected.pathogenicBacteria.length >= 3) {
+            products.push({
+                name: "Berberine Intrinsic",
+                dosing: { text: "1 dropper 2x daily", perDay: 2 },
+                indication: "PRIMARY antibacterial botanical (SIBO/dysbiosis)"
+            });
+        }
+    }
+    
+    // VIRUSES - Both Tox and botanical (viruses need both)
+    if (selected.viruses.length > 0) {
+        products.push({
+            name: "Viru-Tox",
+            dosing: { text: "1 dropper 2x daily", perDay: 2 },
+            indication: "Homeopathic viral detoxification - ADJUNCT (die-off support)"
+        });
+        products.push({
+            name: "Baicalin Skullcap",
+            dosing: { text: "2 caps 2x daily", perDay: 4 },
+            indication: "PRIMARY antiviral botanical with immune modulation"
+        });
+    }
+    
+    // BROAD-SPECTRUM - Only if 2+ pathogen types (biofilm + coverage)
+    if (pathogenTypes >= 2) {
+        products.push({
+            name: "Wild Oregano Oil",
+            dosing: { text: "2-3 drops 2x daily in water", perDay: 2 },
+            indication: "Broad-spectrum antimicrobial (bacteria/fungi/parasites) + biofilm disruption"
+        });
+    }
+    
+    return products;
+}
 
-        function renderCategories() {
-            const container = document.getElementById('categories');
-            container.innerHTML = '';
+function buildPhase3(selected) {
+    const products = [];
+    
+    // GUT LINING REPAIR
+    products.push({
+        name: "Glutamine PLG-U Powder",
+        dosing: { text: "1 scoop 2x daily in water", perDay: 2 },
+        indication: "PRIMARY enterocyte fuel - gut lining repair"
+    });
+    
+    // COLLAGEN + GLUTATHIONE
+    if (selected.permeability.length >= 2) {
+        products.push({
+            name: "Glycine Composite",
+            dosing: { text: "2 caps daily", perDay: 2 },
+            indication: "Collagen synthesis + glutathione production"
+        });
+    }
+    
+    // CHLORELLA (DETOX BINDER)
+    products.push({
+        name: "MetaChlor",
+        dosing: { text: "1 cap 3x daily", perDay: 3 },
+        indication: "Broken cell wall chlorella (500mg CGF) - binds heavy metals and supports cellular repair during gut restoration"
+    });
+    
+    // BUTYRATE SUPPORT (for low SCFA/butyrate)
+    if (selected.scfa.length >= 1 || selected.diversity.length >= 1) {
+        products.push({
+            name: "Flora Syntropy",
+            dosing: { text: "2 caps daily", perDay: 2 },
+            indication: "Prebiotic fiber to support SCFA-producing bacteria (Faecalibacterium, Roseburia, Ruminococcus)"
+        });
+    } else {
+        // PREBIOTIC (standard dose)
+        products.push({
+            name: "Flora Syntropy",
+            dosing: { text: "1 cap daily", perDay: 1 },
+            indication: "Prebiotic/synbiotic support for beneficial bacteria"
+        });
+    }
+    
+    // PROBIOTICS
+    products.push({
+        name: "Symbiome CMF-50B",
+        dosing: { text: "1 cap daily", perDay: 1 },
+        indication: "High-potency 50 billion CFU probiotic - microbiome restoration"
+    });
+    
+    products.push({
+        name: "Saccharomyces boulardii Forte",
+        dosing: { text: "2 caps 2x daily", perDay: 4 },
+        indication: "Non-colonizing beneficial yeast - competitive exclusion"
+    });
+    
+    return products;
+}
 
-            Object.keys(products).forEach(category => {
-                const categoryDiv = document.createElement('div');
-                categoryDiv.className = 'category';
+function displayProtocol(protocol) {
+    const output = document.getElementById('protocolOutput');
+    const patientName = document.getElementById('patientName').value || 'Patient';
+    const patientDOB = document.getElementById('patientDOB').value || 'N/A';
+    const testDate = document.getElementById('testDate').value || 'N/A';
+    const protocolDate = document.getElementById('protocolDate').value || new Date().toLocaleDateString();
+    
+    let html = `
+        <div class="patient-info">
+            <h2>Patient Protocol Summary</h2>
+            <div class="info-grid">
+                <div><strong>Name:</strong> ${patientName}</div>
+                <div><strong>DOB:</strong> ${patientDOB}</div>
+                <div><strong>Test Date:</strong> ${testDate}</div>
+                <div><strong>Protocol Date:</strong> ${protocolDate}</div>
+            </div>
+        </div>
+    `;
+    
+    html += generatePhaseHTML('PHASE 1 - FOUNDATION & DRAINAGE', 
+                              'Weeks 1-4', protocol.phase1, 28);
+    html += generatePhaseHTML('PHASE 2 - TARGETED INTERVENTION', 
+                              'Weeks 5-8 (Continue drainage + Add intervention)', 
+                              protocol.phase2, 28);
+    html += generatePhaseHTML('PHASE 3 - REPAIR & RESTORATION', 
+                              'Weeks 9-12+ (Stop antimicrobials after Week 8)', 
+                              protocol.phase3, 28);
+    
+    const totalCost = calculateGrandTotal(protocol);
+    html += `
+        <div class="grand-total">
+            <h2>📊 Complete 12-Week Protocol Summary</h2>
+            <div class="total-breakdown">
+                <div class="total-item">
+                    <div class="total-label">Phase 1 (Weeks 1-4)</div>
+                    <div class="total-value">$${totalCost.phase1.toFixed(2)}</div>
+                </div>
+                <div class="total-item">
+                    <div class="total-label">Phase 2 (Weeks 5-8)</div>
+                    <div class="total-value">$${totalCost.phase2.toFixed(2)}</div>
+                </div>
+                <div class="total-item">
+                    <div class="total-label">Phase 3 (Weeks 9-12)</div>
+                    <div class="total-value">$${totalCost.phase3.toFixed(2)}</div>
+                </div>
+                <div class="total-item" style="background: rgba(255,255,255,0.3);">
+                    <div class="total-label">GRAND TOTAL (12 weeks)</div>
+                    <div class="total-value">$${totalCost.grand.toFixed(2)}</div>
+                </div>
+            </div>
+            <button class="print-btn" onclick="window.print()">🖨️ Print Protocol</button>
+        </div>
+    `;
+    
+    output.innerHTML = html;
+    output.style.display = 'block';
+    output.scrollIntoView({ behavior: 'smooth' });
+}
+
+function generatePhaseHTML(title, subtitle, products, phaseDuration) {
+    let html = `
+        <div class="phase-container">
+            <div class="phase-header">
+                <h2>${title}</h2>
+                <p>${subtitle}</p>
+            </div>
+    `;
+    
+    let phaseSubtotal = 0;
+    let phaseTax = 0;
+    let totalBottles = 0;
+    
+    products.forEach((product, index) => {
+        const daysSupply = calculateDaysSupply(product.name, product.dosing);
+        const bottlesNeeded = calculateBottlesNeeded(daysSupply, phaseDuration);
+        const pricing = calculatePricing(product.name, bottlesNeeded);
+        const productData = PHYSICA_PRODUCTS[product.name];
+        
+        phaseSubtotal += pricing.subtotal;
+        phaseTax += pricing.tax;
+        totalBottles += bottlesNeeded;
+        
+        html += `
+            <div class="product-card">
+                <div class="product-header">
+                    <div class="product-name">${index + 1}. ${product.name} (Physica)</div>
+                    <div class="product-price-badge">$${pricing.total.toFixed(2)}</div>
+                </div>
                 
-                const header = document.createElement('div');
-                header.className = 'category-header';
-                header.innerHTML = `
-                    <h3>${category}</h3>
-                    <span class="toggle-icon">▼</span>
-                `;
-                header.onclick = () => toggleCategory(header);
-
-                const content = document.createElement('div');
-                content.className = 'category-content';
+                <div class="product-indication">
+                    <strong>Indication:</strong> ${product.indication}
+                </div>
                 
-                products[category].forEach(product => {
-                    const productDiv = document.createElement('div');
-                    productDiv.className = 'product-item';
-                    productDiv.innerHTML = `
-                        <div class="product-name">${product.name}</div>
-                        <div class="dosing-controls">
-                            <select class="dosing-select" onchange="handleDosingChange(this, '${category}', '${product.name}')">
-                                <option value="">Select Dosing Level</option>
-                                <option value="general">General</option>
-                                <option value="acute">Acute</option>
-                                <option value="chronic">Chronic</option>
-                            </select>
-                            <select class="phase-select" onchange="handlePhaseChange(this, '${category}', '${product.name}')">
-                                <option value="">Select Phase</option>
-                                <option value="phase1">Phase 1</option>
-                                <option value="phase2">Phase 2</option>
-                                <option value="phase3">Phase 3</option>
-                                <option value="phase4">Phase 4</option>
-                            </select>
-                        </div>
-                    `;
-                    content.appendChild(productDiv);
-                });
-
-                categoryDiv.appendChild(header);
-                categoryDiv.appendChild(content);
-                container.appendChild(categoryDiv);
-            });
-
-            document.querySelectorAll('.category-content')[0]?.classList.add('active');
-            document.querySelectorAll('.toggle-icon')[0]?.classList.add('rotated');
-        }
-
-        function toggleCategory(header) {
-            const content = header.nextElementSibling;
-            const icon = header.querySelector('.toggle-icon');
-            content.classList.toggle('active');
-            icon.classList.toggle('rotated');
-        }
-
-        function handleDosingChange(select, category, productName) {
-            const dosingLevel = select.value;
-            const phaseSelect = select.parentElement.querySelector('.phase-select');
-            const phase = phaseSelect.value;
-
-            if (!dosingLevel || !phase) return;
-
-            const product = products[category].find(p => p.name === productName);
-            const existingIndex = selectedProducts.findIndex(p => p.name === productName);
-
-            const selectedProduct = {
-                name: productName,
-                category: category,
-                dosingLevel: dosingLevel,
-                dosing: product[dosingLevel],
-                phase: phase
-            };
-
-            if (existingIndex >= 0) {
-                selectedProducts[existingIndex] = selectedProduct;
-            } else {
-                selectedProducts.push(selectedProduct);
-            }
-
-            renderSelectedProducts();
-            select.closest('.product-item').classList.add('selected');
-        }
-
-        function handlePhaseChange(select, category, productName) {
-            const dosingSelect = select.parentElement.querySelector('.dosing-select');
-            const dosingLevel = dosingSelect.value;
-            const phase = select.value;
-
-            if (!dosingLevel || !phase) return;
-
-            const product = products[category].find(p => p.name === productName);
-            const existingIndex = selectedProducts.findIndex(p => p.name === productName);
-
-            const selectedProduct = {
-                name: productName,
-                category: category,
-                dosingLevel: dosingLevel,
-                dosing: product[dosingLevel],
-                phase: phase
-            };
-
-            if (existingIndex >= 0) {
-                selectedProducts[existingIndex] = selectedProduct;
-            } else {
-                selectedProducts.push(selectedProduct);
-            }
-
-            renderSelectedProducts();
-            select.closest('.product-item').classList.add('selected');
-        }
-
-        function renderSelectedProducts() {
-            const container = document.getElementById('selectedProducts');
-            if (selectedProducts.length === 0) {
-                container.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">No products selected yet</p>';
-                return;
-            }
-
-            const byPhase = {
-                phase1: [],
-                phase2: [],
-                phase3: [],
-                phase4: []
-            };
-
-            selectedProducts.forEach(product => {
-                byPhase[product.phase].push(product);
-            });
-
-            container.innerHTML = '';
-            Object.keys(byPhase).forEach(phase => {
-                if (byPhase[phase].length > 0) {
-                    const phaseLabel = {
-                        phase1: 'Phase 1',
-                        phase2: 'Phase 2',
-                        phase3: 'Phase 3',
-                        phase4: 'Phase 4'
-                    }[phase];
-
-                    const phaseHeader = document.createElement('h3');
-                    phaseHeader.style.cssText = 'color: #1e3c72; margin: 20px 0 10px 0; font-size: 1.1em;';
-                    phaseHeader.innerHTML = `<span class="phase-badge ${phase}">${phaseLabel}</span>`;
-                    container.appendChild(phaseHeader);
-
-                    byPhase[phase].forEach(product => {
-                        const productDiv = document.createElement('div');
-                        productDiv.className = `selected-item ${phase}`;
-                        productDiv.innerHTML = `
-                            <div class="selected-item-header">
-                                <span class="selected-item-name">${product.name}</span>
-                                <button class="remove-btn" onclick="removeProduct('${product.name}')">Remove</button>
-                            </div>
-                            <div class="dosing-info">
-                                <strong>${product.dosingLevel.charAt(0).toUpperCase() + product.dosingLevel.slice(1)} Dosing:</strong> ${product.dosing}
-                            </div>
-                        `;
-                        container.appendChild(productDiv);
-                    });
-                }
-            });
-        }
-
-        function removeProduct(productName) {
-            selectedProducts = selectedProducts.filter(p => p.name !== productName);
-            renderSelectedProducts();
-            
-            document.querySelectorAll('.product-item').forEach(item => {
-                if (item.querySelector('.product-name').textContent === productName) {
-                    item.classList.remove('selected');
-                    item.querySelectorAll('select').forEach(select => select.value = '');
-                }
-            });
-        }
-
-        function handleSearch(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            document.querySelectorAll('.product-item').forEach(item => {
-                const productName = item.querySelector('.product-name').textContent.toLowerCase();
-                item.style.display = productName.includes(searchTerm) ? 'block' : 'none';
-            });
-        }
-
-        function generateReport() {
-            const patientName = document.getElementById('patientName').value || 'Patient';
-            const protocolDate = document.getElementById('protocolDate').value || new Date().toISOString().split('T')[0];
-            const clinicalNotes = document.getElementById('clinicalNotes').value;
-
-            let reportHTML = `
-                <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">
-                    <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #1e3c72; padding-bottom: 20px;">
-                        <h1 style="color: #1e3c72; margin: 0;">Root Health</h1>
-                        <h2 style="color: #667eea; margin: 10px 0;">Supplement Protocol</h2>
+                <div class="product-details">
+                    <div class="detail-item">
+                        <div class="detail-label">Dosing</div>
+                        <div class="detail-value">${product.dosing.text}</div>
                     </div>
-                    
-                    <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                        <p><strong>Patient:</strong> ${patientName}</p>
-                        <p><strong>Date:</strong> ${protocolDate}</p>
+                    <div class="detail-item">
+                        <div class="detail-label">Bottle Size</div>
+                        <div class="detail-value">${productData.size}</div>
                     </div>
-            `;
-
-            const byPhase = {
-                phase1: [],
-                phase2: [],
-                phase3: [],
-                phase4: []
-            };
-
-            selectedProducts.forEach(product => {
-                byPhase[product.phase].push(product);
-            });
-
-            Object.keys(byPhase).forEach(phase => {
-                if (byPhase[phase].length > 0) {
-                    const phaseLabel = {
-                        phase1: 'Phase 1',
-                        phase2: 'Phase 2',
-                        phase3: 'Phase 3',
-                        phase4: 'Phase 4'
-                    }[phase];
-
-                    const phaseColor = {
-                        phase1: '#4caf50',
-                        phase2: '#2196f3',
-                        phase3: '#ff9800',
-                        phase4: '#9c27b0'
-                    }[phase];
-
-                    reportHTML += `
-                        <div style="margin: 30px 0;">
-                            <h3 style="color: ${phaseColor}; border-bottom: 2px solid ${phaseColor}; padding-bottom: 10px;">
-                                ${phaseLabel}
-                            </h3>
-                    `;
-
-                    byPhase[phase].forEach(product => {
-                        reportHTML += `
-                            <div style="background: white; padding: 15px; margin: 10px 0; border-left: 4px solid ${phaseColor}; border-radius: 5px;">
-                                <h4 style="margin: 0 0 10px 0; color: #1e3c72;">${product.name}</h4>
-                                <p style="margin: 5px 0;"><strong>${product.dosingLevel.charAt(0).toUpperCase() + product.dosingLevel.slice(1)} Protocol:</strong> ${product.dosing}</p>
-                            </div>
-                        `;
-                    });
-
-                    reportHTML += `</div>`;
-                }
-            });
-
-            if (clinicalNotes) {
-                reportHTML += `
-                    <div style="margin: 30px 0; padding: 20px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 5px;">
-                        <h3 style="color: #856404; margin-top: 0;">Clinical Notes</h3>
-                        <p style="white-space: pre-wrap;">${clinicalNotes}</p>
+                    <div class="detail-item">
+                        <div class="detail-label">Days per Bottle</div>
+                        <div class="detail-value">${daysSupply} days</div>
                     </div>
-                `;
-            }
-
-            reportHTML += `
-                    <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #ddd; text-align: center; color: #999; font-size: 0.9em;">
-                        <p>Generated by Root Health Supplement Protocol Tool</p>
-                        <p>Physica Energetics Product Line</p>
+                    <div class="detail-item">
+                        <div class="detail-label">Bottles Needed</div>
+                        <div class="detail-value">${bottlesNeeded} bottle${bottlesNeeded > 1 ? 's' : ''}</div>
                     </div>
                 </div>
-            `;
+                
+                <div class="pricing-breakdown">
+                    <div class="pricing-row">
+                        <span>Retail Price:</span>
+                        <span>$${pricing.pricePerBottle.toFixed(2)}/bottle</span>
+                    </div>
+                    <div class="pricing-row">
+                        <span>Subtotal (${bottlesNeeded} bottle${bottlesNeeded > 1 ? 's' : ''}):</span>
+                        <span>$${pricing.subtotal.toFixed(2)}</span>
+                    </div>
+                    <div class="pricing-row">
+                        <span>NC Tax (7.25%):</span>
+                        <span>$${pricing.tax.toFixed(2)}</span>
+                    </div>
+                    <div class="pricing-row">
+                        <span>Phase Cost:</span>
+                        <span>$${pricing.total.toFixed(2)}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    const phaseTotal = phaseSubtotal + phaseTax;
+    
+    html += `
+            <div class="phase-summary">
+                <h3>Phase Summary</h3>
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <div class="summary-label">Total Products</div>
+                        <div class="summary-value">${products.length}</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Total Bottles</div>
+                        <div class="summary-value">${totalBottles}</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Duration</div>
+                        <div class="summary-value">${phaseDuration / 7} weeks</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Subtotal</div>
+                        <div class="summary-value">$${phaseSubtotal.toFixed(2)}</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Tax (7.25%)</div>
+                        <div class="summary-value">$${phaseTax.toFixed(2)}</div>
+                    </div>
+                    <div class="summary-item" style="background: #2E7D32;">
+                        <div class="summary-label" style="color: white;">PHASE TOTAL</div>
+                        <div class="summary-value" style="color: white;">$${phaseTotal.toFixed(2)}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    return html;
+}
 
-            const reportWindow = window.open('', '_blank');
-            reportWindow.document.write(reportHTML);
-            reportWindow.document.close();
-            reportWindow.print();
-        }
+function calculateGrandTotal(protocol) {
+    let phase1Total = 0;
+    let phase2Total = 0;
+    let phase3Total = 0;
+    
+    protocol.phase1.forEach(product => {
+        const daysSupply = calculateDaysSupply(product.name, product.dosing);
+        const bottlesNeeded = calculateBottlesNeeded(daysSupply, 28);
+        const pricing = calculatePricing(product.name, bottlesNeeded);
+        phase1Total += pricing.total;
+    });
+    
+    protocol.phase2.forEach(product => {
+        const daysSupply = calculateDaysSupply(product.name, product.dosing);
+        const bottlesNeeded = calculateBottlesNeeded(daysSupply, 28);
+        const pricing = calculatePricing(product.name, bottlesNeeded);
+        phase2Total += pricing.total;
+    });
+    
+    protocol.phase3.forEach(product => {
+        const daysSupply = calculateDaysSupply(product.name, product.dosing);
+        const bottlesNeeded = calculateBottlesNeeded(daysSupply, 28);
+        const pricing = calculatePricing(product.name, bottlesNeeded);
+        phase3Total += pricing.total;
+    });
+    
+    return {
+        phase1: phase1Total,
+        phase2: phase2Total,
+        phase3: phase3Total,
+        grand: phase1Total + phase2Total + phase3Total
+    };
+}
 
-        function clearAll() {
-            if (confirm('Are you sure you want to clear all selections?')) {
-                selectedProducts = [];
-                renderSelectedProducts();
-                document.querySelectorAll('.product-item').forEach(item => {
-                    item.classList.remove('selected');
-                    item.querySelectorAll('select').forEach(select => select.value = '');
-                });
-                document.getElementById('clinicalNotes').value = '';
-            }
-        }
-
-        initializeApp();
+window.onload = initializeCheckboxes;
     </script>
 </body>
 </html>
