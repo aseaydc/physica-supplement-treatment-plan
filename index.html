@@ -567,7 +567,8 @@ const PHYSICA_PRODUCTS = {
     "MetaChlor": { price: 47.28, form: "capsules", size: "60 caps", capsules: 60 },
     "Symbiome CMF-50B": { price: 61.80, form: "capsules", size: "30 caps", capsules: 30 },
     "Saccharomyces boulardii Forte": { price: 38.12, form: "capsules", size: "60 caps", capsules: 60 },
-    "Flora Syntropy": { price: 61.80, form: "capsules", size: "90 caps", capsules: 90 }
+    "Flora Syntropy": { price: 61.80, form: "capsules", size: "90 caps", capsules: 90 },
+    "NAC Forte (N-Acetyl L-Cysteine)": { price: 45.00, form: "capsules", size: "120 caps", capsules: 120 }
 };
 
 // Calculate days supply
@@ -1027,23 +1028,18 @@ function buildPhase1(selected) {
                           selected.fungi.length + selected.viruses.length;
     const inflammationLevel = selected.inflammatory.length;
     
-    // DRAINAGE - REQUIRED (1-2 products max)
+    // DRAINAGE - ONE PRODUCT ONLY (severity-based)
     if (totalPathology >= 5 || inflammationLevel >= 4) {
         products.push({
             name: "Lymph 3 CHRONIC",
             dosing: { text: "1 dropper 2x daily", perDay: 2 },
             indication: "Severe ECM congestion - longstanding conditions with deep pathology"
         });
-        products.push({
-            name: "Drainage Milieu",
-            dosing: { text: "1 dropper 2x daily", perDay: 2 },
-            indication: "Mesenchymal drainage for biofilm disruption"
-        });
     } else if (totalPathology >= 3 || inflammationLevel >= 2) {
         products.push({
             name: "Lymph 2 MATRIX",
             dosing: { text: "1 dropper 2x daily", perDay: 2 },
-            indication: "Moderate ECM congestion - chronic inflammation and biofilm"
+            indication: "Moderate ECM congestion - chronic inflammation"
         });
     } else {
         products.push({
@@ -1140,55 +1136,49 @@ function buildPhase2(selected, phase1Products) {
         }
     }
     
-    // PARASITES - Tox always, botanical only if ≥3
+    // PARASITES - If present, TREAT IT (Tox + botanical)
     if (parasiteCount > 0) {
         products.push({
             name: "Para-Tox",
             dosing: { text: "1 dropper 2x daily", perDay: 2 },
             indication: "Homeopathic parasite detoxification - ADJUNCT (die-off support)"
         });
-        if (parasiteCount >= 3) {
-            products.push({
-                name: "Artemisia Intrinsic",
-                dosing: { text: "1 dropper 3x daily", perDay: 3 },
-                indication: "PRIMARY antiparasitic botanical (wormwood)"
-            });
-        }
+        products.push({
+            name: "Artemisia Intrinsic",
+            dosing: { text: "1 dropper 3x daily", perDay: 3 },
+            indication: "PRIMARY antiparasitic botanical (wormwood)"
+        });
     }
     
-    // FUNGI - Tox always, botanical only if ≥2
+    // FUNGI - If present, TREAT IT (Tox + botanical)
     if (selected.fungi.length > 0) {
         products.push({
             name: "Can-Tox",
             dosing: { text: "1 dropper 2x daily", perDay: 2 },
             indication: "Homeopathic candida/yeast detoxification - ADJUNCT (die-off support)"
         });
-        if (selected.fungi.length >= 2) {
-            products.push({
-                name: "Lapacho Intrinsic",
-                dosing: { text: "1 dropper 2x daily", perDay: 2 },
-                indication: "PRIMARY antifungal botanical (pau d'arco)"
-            });
-        }
+        products.push({
+            name: "Lapacho Intrinsic",
+            dosing: { text: "1 dropper 2x daily", perDay: 2 },
+            indication: "PRIMARY antifungal botanical (pau d'arco)"
+        });
     }
     
-    // BACTERIA - Tox always, botanical only if ≥3
+    // BACTERIA - If present, TREAT IT (Tox + botanical)
     if (selected.pathogenicBacteria.length > 0) {
         products.push({
             name: "Bacteria-Tox",
             dosing: { text: "1 dropper 2x daily", perDay: 2 },
             indication: "Homeopathic bacterial detoxification - ADJUNCT (die-off support)"
         });
-        if (selected.pathogenicBacteria.length >= 3) {
-            products.push({
-                name: "Berberine Intrinsic",
-                dosing: { text: "1 dropper 2x daily", perDay: 2 },
-                indication: "PRIMARY antibacterial botanical (SIBO/dysbiosis)"
-            });
-        }
+        products.push({
+            name: "Berberine Intrinsic",
+            dosing: { text: "1 dropper 2x daily", perDay: 2 },
+            indication: "PRIMARY antibacterial botanical (SIBO/dysbiosis)"
+        });
     }
     
-    // VIRUSES - Both Tox and botanical (viruses need both)
+    // VIRUSES - If present, TREAT IT (Tox + botanical)
     if (selected.viruses.length > 0) {
         products.push({
             name: "Viru-Tox",
@@ -1208,6 +1198,15 @@ function buildPhase2(selected, phase1Products) {
             name: "Wild Oregano Oil",
             dosing: { text: "2-3 drops 2x daily in water", perDay: 2 },
             indication: "Broad-spectrum antimicrobial (bacteria/fungi/parasites) + biofilm disruption"
+        });
+    }
+    
+    // NAC FORTE - Only for severe biofilm/SIBO cases
+    if (selected.pathogenicBacteria.length >= 5 || selected.inflammatory.length >= 4 || selected.digestive.length >= 3) {
+        products.push({
+            name: "NAC Forte (N-Acetyl L-Cysteine)",
+            dosing: { text: "1 cap 2x daily", perDay: 2 },
+            indication: "SUPERIOR biofilm disruption + glutathione support for detoxification"
         });
     }
     
