@@ -372,39 +372,217 @@
             color: white;
         }
 
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #2E7D32 0%, #66BB6A 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(46, 125, 50, 0.4);
+        }
+
+        .action-btn:active {
+            transform: translateY(0);
+        }
+
+        /* PRINT STYLES */
         @media print {
-        .protocol-output {
-            display: block !important;
-        }
-        .header {
-            background: white !important;
-            color: #2E7D32 !important;
-            page-break-after: avoid;
-        }
-        .logo-img {
-            height: 80px !important;
-            margin-bottom: 10px !important;
-        }
-        .phase-container {
-            page-break-inside: avoid;
-            background: white !important;
-            border: 2px solid #000 !important;
-        }
-        h3 {
-            color: #000 !important;
-        }
-        .patient-info, .marker-selection {
-            border: 1px solid #000 !important;
-        }
-    }
-            }
-            .header {
+            /* Hide everything except protocol output */
+            body {
                 background: white !important;
-                color: #2E7D32 !important;
-                page-break-after: avoid;
+                padding: 0 !important;
+                margin: 0 !important;
             }
-            .phase-container {
-                page-break-inside: avoid;
+
+            .header,
+            .patient-info,
+            .section,
+            .generate-btn,
+            .action-buttons,
+            .input-section,
+            button {
+                display: none !important;
+            }
+
+            .container {
+                max-width: 100% !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+            }
+
+            .content {
+                padding: 10px !important;
+            }
+
+            .protocol-output {
+                display: block !important;
+                margin: 0 !important;
+            }
+
+            /* Make phase headers MUCH more visible */
+            .phase-section h2 {
+                background: #1a365d !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                font-size: 18px !important;
+                font-weight: 900 !important;
+                padding: 12px 15px !important;
+                margin: 15px 0 10px 0 !important;
+                border: 3px solid #000 !important;
+                page-break-after: avoid !important;
+            }
+
+            /* Compact pricing boxes */
+            .pricing-box {
+                font-size: 9px !important;
+                padding: 5px !important;
+                margin: 3px 0 !important;
+                page-break-inside: avoid !important;
+                border: 1px solid #000 !important;
+            }
+
+            .pricing-box h4 {
+                font-size: 10px !important;
+                margin-bottom: 3px !important;
+            }
+
+            .pricing-row {
+                margin: 1px 0 !important;
+                font-size: 8px !important;
+                padding: 2px 0 !important;
+            }
+
+            .pricing-summary,
+            .phase-summary {
+                font-size: 9px !important;
+                padding: 5px !important;
+                page-break-inside: avoid !important;
+            }
+
+            /* Product items compact */
+            .product-item {
+                margin-bottom: 8px !important;
+                padding: 6px !important;
+                page-break-inside: avoid !important;
+                border: 1px solid #ccc !important;
+            }
+
+            .product-header {
+                margin-bottom: 5px !important;
+            }
+
+            .product-name {
+                font-size: 11px !important;
+                font-weight: bold !important;
+            }
+
+            .product-price-badge {
+                font-size: 9px !important;
+                padding: 3px 8px !important;
+            }
+
+            .product-details {
+                margin-bottom: 5px !important;
+                gap: 5px !important;
+            }
+
+            .detail-item {
+                padding: 4px !important;
+            }
+
+            .detail-label {
+                font-size: 8px !important;
+            }
+
+            .detail-value {
+                font-size: 9px !important;
+            }
+
+            .product-indication {
+                font-size: 8px !important;
+                padding: 5px !important;
+                margin-bottom: 5px !important;
+            }
+
+            .pricing-breakdown {
+                padding: 5px !important;
+            }
+
+            /* Grand total compact */
+            .grand-total {
+                padding: 10px !important;
+                font-size: 10px !important;
+                page-break-inside: avoid !important;
+            }
+
+            .grand-total h2 {
+                font-size: 14px !important;
+                margin-bottom: 8px !important;
+            }
+
+            .total-breakdown {
+                gap: 8px !important;
+                margin-top: 8px !important;
+            }
+
+            .total-item {
+                padding: 8px !important;
+            }
+
+            .total-label {
+                font-size: 8px !important;
+            }
+
+            .total-value {
+                font-size: 12px !important;
+            }
+
+            /* Summary grids */
+            .summary-grid {
+                gap: 5px !important;
+            }
+
+            .summary-item {
+                padding: 5px !important;
+            }
+
+            .summary-label {
+                font-size: 8px !important;
+            }
+
+            .summary-value {
+                font-size: 11px !important;
+            }
+
+            /* Phase sections */
+            .phase-section {
+                page-break-inside: avoid !important;
+                margin: 10px 0 !important;
+            }
+
+            /* Avoid page breaks */
+            h2, h3, h4 {
+                page-break-after: avoid !important;
             }
         }
     </style>
@@ -1321,13 +1499,25 @@ function displayProtocol(protocol) {
                     <div class="total-value">$${totalCost.grand.toFixed(2)}</div>
                 </div>
             </div>
-            <button class="print-btn" onclick="window.print()">🖨️ Print Protocol</button>
+            <div class="action-buttons">
+                <button class="action-btn" onclick="window.print()">🖨️ Print Protocol</button>
+                <button class="action-btn" onclick="downloadPDF()">📄 Download PDF</button>
+            </div>
         </div>
     `;
     
     output.innerHTML = html;
     output.style.display = 'block';
     output.scrollIntoView({ behavior: 'smooth' });
+}
+
+function downloadPDF() {
+    // Use browser's print dialog with "Save as PDF" option
+    const patientName = document.getElementById('patientName').value || 'Patient';
+    const date = new Date().toISOString().split('T')[0];
+    document.title = `Gut_Zoomer_Protocol_${patientName.replace(/\s+/g, '_')}_${date}`;
+    window.print();
+    document.title = 'Gut Zoomer (Vibrant Wellness) Protocol Generator - Root Health';
 }
 
 function generatePhaseHTML(title, subtitle, products, phaseDuration) {
