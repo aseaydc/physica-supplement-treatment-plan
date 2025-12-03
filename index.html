@@ -694,92 +694,128 @@
         }
 
         function generateReport() {
-            const patientName = document.getElementById('patientName').value || 'Patient';
-            const protocolDate = document.getElementById('protocolDate').value || new Date().toISOString().split('T')[0];
-            const clinicalNotes = document.getElementById('clinicalNotes').value;
+    const patientName = document.getElementById('patientName').value || 'Patient';
+    const protocolDate = document.getElementById('protocolDate').value || new Date().toISOString().split('T')[0];
+    const clinicalNotes = document.getElementById('clinicalNotes').value;
 
-            let reportHTML = `
-                <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">
-                    <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #1e3c72; padding-bottom: 20px;">
-                        <h1 style="color: #1e3c72; margin: 0;">Root Health</h1>
-                        <h2 style="color: #667eea; margin: 10px 0;">Supplement Protocol</h2>
-                    </div>
-                    
-                    <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                        <p><strong>Patient:</strong> ${patientName}</p>
-                        <p><strong>Date:</strong> ${protocolDate}</p>
-                    </div>
+    // Get the logo from the page
+    const logoSrc = document.querySelector('.logo').src;
+
+    let reportHTML = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Supplement Protocol - ${patientName}</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+                .header {
+                    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+                    color: white;
+                    text-align: center;
+                    margin-bottom: 30px;
+                    padding: 30px 40px;
+                    border-radius: 10px;
+                }
+                .logo { width: 200px; height: auto; margin-bottom: 15px; }
+                .header h1 { font-size: 2.2em; margin: 10px 0; }
+                .header p { font-size: 1.05em; opacity: 0.9; margin: 5px 0; }
+                .patient-info { background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+                .phase-section { margin: 30px 0; }
+                .phase-header { color: #1e3c72; border-bottom: 2px solid; padding-bottom: 10px; margin-bottom: 15px; }
+                .product-item { background: white; padding: 15px; margin: 10px 0; border-left: 4px solid; border-radius: 5px; }
+                .product-name { font-weight: bold; color: #1e3c72; margin-bottom: 10px; }
+                .notes-section { margin: 30px 0; padding: 20px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 5px; }
+                .footer { margin-top: 40px; padding-top: 20px; border-top: 2px solid #ddd; text-align: center; color: #999; font-size: 0.9em; }
+                @media print {
+                    body { padding: 0; }
+                    .header { border-radius: 0; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <img src="${logoSrc}" alt="Root Health Logo" class="logo">
+                <h1>Supplement Recommendations</h1>
+                <p>powered by Physica Energetics</p>
+            </div>
+            
+            <div class="patient-info">
+                <p><strong>Patient:</strong> ${patientName}</p>
+                <p><strong>Date:</strong> ${protocolDate}</p>
+            </div>
+    `;
+
+    const byPhase = {
+        phase1: [],
+        phase2: [],
+        phase3: [],
+        phase4: []
+    };
+
+    selectedProducts.forEach(product => {
+        byPhase[product.phase].push(product);
+    });
+
+    const phaseColors = {
+        phase1: '#4caf50',
+        phase2: '#2196f3',
+        phase3: '#ff9800',
+        phase4: '#9c27b0'
+    };
+
+    const phaseLabels = {
+        phase1: 'Phase 1',
+        phase2: 'Phase 2',
+        phase3: 'Phase 3',
+        phase4: 'Phase 4'
+    };
+
+    Object.keys(byPhase).forEach(phase => {
+        if (byPhase[phase].length > 0) {
+            reportHTML += `
+                <div class="phase-section">
+                    <h3 class="phase-header" style="border-color: ${phaseColors[phase]}; color: ${phaseColors[phase]};">
+                        ${phaseLabels[phase]}
+                    </h3>
             `;
 
-            const byPhase = {
-                phase1: [],
-                phase2: [],
-                phase3: [],
-                phase4: []
-            };
-
-            selectedProducts.forEach(product => {
-                byPhase[product.phase].push(product);
-            });
-
-            Object.keys(byPhase).forEach(phase => {
-                if (byPhase[phase].length > 0) {
-                    const phaseLabel = {
-                        phase1: 'Phase 1',
-                        phase2: 'Phase 2',
-                        phase3: 'Phase 3',
-                        phase4: 'Phase 4'
-                    }[phase];
-
-                    const phaseColor = {
-                        phase1: '#4caf50',
-                        phase2: '#2196f3',
-                        phase3: '#ff9800',
-                        phase4: '#9c27b0'
-                    }[phase];
-
-                    reportHTML += `
-                        <div style="margin: 30px 0;">
-                            <h3 style="color: ${phaseColor}; border-bottom: 2px solid ${phaseColor}; padding-bottom: 10px;">
-                                ${phaseLabel}
-                            </h3>
-                    `;
-
-                    byPhase[phase].forEach(product => {
-                        reportHTML += `
-                            <div style="background: white; padding: 15px; margin: 10px 0; border-left: 4px solid ${phaseColor}; border-radius: 5px;">
-                                <h4 style="margin: 0 0 10px 0; color: #1e3c72;">${product.name}</h4>
-                                <p style="margin: 5px 0;"><strong>${product.dosingLevel.charAt(0).toUpperCase() + product.dosingLevel.slice(1)} Protocol:</strong> ${product.dosing}</p>
-                            </div>
-                        `;
-                    });
-
-                    reportHTML += `</div>`;
-                }
-            });
-
-            if (clinicalNotes) {
+            byPhase[phase].forEach(product => {
                 reportHTML += `
-                    <div style="margin: 30px 0; padding: 20px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 5px;">
-                        <h3 style="color: #856404; margin-top: 0;">Clinical Notes</h3>
-                        <p style="white-space: pre-wrap;">${clinicalNotes}</p>
+                    <div class="product-item" style="border-left-color: ${phaseColors[phase]};">
+                        <div class="product-name">${product.name}</div>
+                        <p><strong>${product.dosingLevel.charAt(0).toUpperCase() + product.dosingLevel.slice(1)} Protocol:</strong> ${product.dosing}</p>
                     </div>
                 `;
-            }
+            });
 
-            reportHTML += `
-                    <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #ddd; text-align: center; color: #999; font-size: 0.9em;">
-                        <p>Generated by Root Health Supplement Protocol Tool</p>
-                        <p>Physica Energetics Product Line</p>
-                    </div>
-                </div>
-            `;
-
-            const reportWindow = window.open('', '_blank');
-            reportWindow.document.write(reportHTML);
-            reportWindow.document.close();
-            reportWindow.print();
+            reportHTML += `</div>`;
         }
+    });
+
+    if (clinicalNotes) {
+        reportHTML += `
+            <div class="notes-section">
+                <h3 style="color: #856404; margin-top: 0;">Clinical Notes</h3>
+                <p style="white-space: pre-wrap;">${clinicalNotes}</p>
+            </div>
+        `;
+    }
+
+    reportHTML += `
+            <div class="footer">
+                <p>Generated by Root Health Supplement Protocol Tool</p>
+                <p>Physica Energetics Product Line</p>
+            </div>
+        </body>
+        </html>
+    `;
+
+    const reportWindow = window.open('', '_blank');
+    reportWindow.document.write(reportHTML);
+    reportWindow.document.close();
+    reportWindow.print();
+}
 
         function clearAll() {
             if (confirm('Are you sure you want to clear all selections?')) {
