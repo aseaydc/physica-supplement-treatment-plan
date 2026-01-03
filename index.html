@@ -89,6 +89,9 @@
             .btn, .remove-btn {
                 display: none !important;
             }
+            #printPatientInfo {
+                display: block !important;
+            }
             .selected-panel {
                 max-height: none;
                 padding: 20px 30px !important;
@@ -507,16 +510,16 @@
                     
                     <div class="toggle-section">
                         <label class="toggle-switch">
-                            <input type="checkbox" id="discountToggle" onchange="updateTotal()">
+                            <input type="checkbox" id="discountToggle" onchange="toggleDiscount(); renderSelectedProducts();">
                             <span class="toggle-slider"></span>
                         </label>
                         <label class="toggle-label">Apply Discount:</label>
-                        <input type="number" id="discountPercent" class="toggle-input" placeholder="%" min="0" max="100" value="10" disabled onchange="updateTotal()">
+                        <input type="number" id="discountPercent" class="toggle-input" placeholder="%" min="0" max="100" value="10" disabled onchange="renderSelectedProducts()">
                     </div>
                     
                     <div class="toggle-section">
                         <label class="toggle-switch">
-                            <input type="checkbox" id="taxToggle" onchange="updateTotal()">
+                            <input type="checkbox" id="taxToggle" onchange="renderSelectedProducts()">
                             <span class="toggle-slider"></span>
                         </label>
                         <label class="toggle-label">Sales Tax (7.25% - Wake County, NC)</label>
@@ -531,6 +534,15 @@
             </div>
 
             <div class="selected-panel">
+                <!-- Print-only patient info display -->
+                <div id="printPatientInfo" style="display: none; margin-bottom: 20px; padding: 15px; background: white; border-radius: 8px; border: 2px solid #1e3c72;">
+                    <h3 style="color: #1e3c72; margin-bottom: 10px;">Patient Information</h3>
+                    <div style="margin-bottom: 8px;"><strong>Patient Name:</strong> <span id="printPatientName">N/A</span></div>
+                    <div style="margin-bottom: 8px;"><strong>Date:</strong> <span id="printDate">N/A</span></div>
+                    <div style="margin-bottom: 8px;"><strong>Clinical Notes:</strong></div>
+                    <div id="printNotes" style="white-space: pre-wrap; padding: 8px; background: #f8f9fa; border-radius: 4px; min-height: 20px;">N/A</div>
+                </div>
+                
                 <div class="patient-info">
                     <h3>Selected Supplements</h3>
                     <p style="font-size: 0.9em; color: #666; margin-top: 8px; font-style: italic;">
@@ -1052,13 +1064,53 @@
                     `).join('')}
                     <div style="margin-top: 20px; padding-top: 20px; border-top: 3px solid rgba(255,255,255,0.5);">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                            <strong style="font-size: 1.3em;">TOTAL:</strong>
-                            <span style="font-size: 1.3em;"><strong>${formatTotals(grandTotalBottles, grandTotalKits)}</strong></span>
+                            <strong style="font-size: 1.1em;">TOTAL:</strong>
+                            <span style="font-size: 1.1em;"><strong>${formatTotals(grandTotalBottles, grandTotalKits)}</strong></span>
                         </div>
-                        <div style="display: flex; justify-content: space-between;">
-                            <strong style="font-size: 1.3em;">TOTAL COST:</strong>
-                            <span style="font-size: 1.3em; color: #81c784;"><strong>$${grandTotalCost.toFixed(2)}</strong></span>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <strong style="font-size: 1.1em;">Subtotal:</strong>
+                            <span style="font-size: 1.1em;"><strong>$${grandTotalCost.toFixed(2)}</strong></span>
                         </div>
+                        ${(() => {
+                            const discountEnabled = document.getElementById('discountToggle')?.checked || false;
+                            const discountPercent = discountEnabled ? (parseFloat(document.getElementById('discountPercent')?.value) || 0) : 0;
+                            const discountAmount = grandTotalCost * (discountPercent / 100);
+                            const afterDiscount = grandTotalCost - discountAmount;
+                            
+                            const taxEnabled = document.getElementById('taxToggle')?.checked || false;
+                            const taxAmount = taxEnabled ? afterDiscount * 0.0725 : 0;
+                            const finalTotal = afterDiscount + taxAmount;
+                            
+                            let html = '';
+                            if (discountEnabled && discountPercent > 0) {
+                                html += `
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                        <span style="font-size: 1.05em;">Discount (${discountPercent.toFixed(0)}%):</span>
+                                        <span style="font-size: 1.05em; color: #81c784;">-$${discountAmount.toFixed(2)}</span>
+                                    </div>`;
+                            }
+                            if (taxEnabled) {
+                                html += `
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                        <span style="font-size: 1.05em;">Sales Tax (7.25%):</span>
+                                        <span style="font-size: 1.05em;">+$${taxAmount.toFixed(2)}</span>
+                                    </div>`;
+                            }
+                            if (discountEnabled || taxEnabled) {
+                                html += `
+                                    <div style="display: flex; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 2px solid rgba(255,255,255,0.3);">
+                                        <strong style="font-size: 1.3em;">FINAL TOTAL:</strong>
+                                        <span style="font-size: 1.3em; color: #81c784;"><strong>$${finalTotal.toFixed(2)}</strong></span>
+                                    </div>`;
+                            } else {
+                                html += `
+                                    <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+                                        <strong style="font-size: 1.3em;">TOTAL COST:</strong>
+                                        <span style="font-size: 1.3em; color: #81c784;"><strong>$${grandTotalCost.toFixed(2)}</strong></span>
+                                    </div>`;
+                            }
+                            return html;
+                        })()}
                     </div>
                 </div>
             `;
@@ -1122,6 +1174,12 @@
             }
         }
 
+        function toggleDiscount() {
+            const toggle = document.getElementById('discountToggle');
+            const input = document.getElementById('discountPercent');
+            input.disabled = !toggle.checked;
+        }
+
         function clearAll() {
             if (confirm('Clear all selected supplements?')) {
                 selectedProducts = [];
@@ -1131,6 +1189,16 @@
         }
 
         function generateReport() {
+            // Populate print patient info
+            const patientName = document.getElementById('patientName').value || 'N/A';
+            const visitDate = document.getElementById('visitDate').value || 'N/A';
+            const clinicalNotes = document.getElementById('clinicalNotes').value || 'N/A';
+            
+            document.getElementById('printPatientName').textContent = patientName;
+            document.getElementById('printDate').textContent = visitDate;
+            document.getElementById('printNotes').textContent = clinicalNotes;
+            
+            // Print
             window.print();
         }
     </script>
