@@ -53,27 +53,54 @@
             body {
                 background: white;
                 padding: 0;
+                margin: 0;
             }
             .container {
                 box-shadow: none;
                 border-radius: 0;
             }
-            .logo-container img {
-                filter: none !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
             .header {
                 background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
+                padding: 15px 30px !important;
+                page-break-after: avoid;
+            }
+            .logo-container {
+                margin-bottom: 8px !important;
+            }
+            .logo-container img {
+                filter: none !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                height: 110px !important;
+            }
+            .header h1 {
+                font-size: 1.6em !important;
+                margin-bottom: 5px !important;
+            }
+            .header p {
+                font-size: 0.85em !important;
+                margin: 2px 0 !important;
             }
             .product-panel, .search-box, .action-buttons {
                 display: none;
             }
             .selected-panel {
                 max-height: none;
-                page-break-inside: avoid;
+                padding: 20px 30px !important;
+                margin: 0 !important;
+            }
+            .patient-info {
+                margin-bottom: 15px !important;
+                padding: 12px !important;
+            }
+            .patient-info h3 {
+                font-size: 1em !important;
+                margin-bottom: 8px !important;
+            }
+            .main-content {
+                padding: 0 !important;
             }
         }
         
@@ -431,6 +458,12 @@
             .header {
                 page-break-after: avoid;
             }
+            .selected-panel > div:last-child {
+                /* Protocol Summary */
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                page-break-before: auto;
+            }
         }
         @media (max-width: 1200px) {
             .main-content {
@@ -497,11 +530,14 @@
             <div class="selected-panel">
                 <div class="patient-info">
                     <h3>Selected Supplements</h3>
+                    <p style="font-size: 0.9em; color: #666; margin-top: 8px; font-style: italic;">
+                        <strong>Note:</strong> Each phase represents an independent 30-day supply. Phase 1 = 30 days, Phase 2 = 30 days, etc.
+                    </p>
                 </div>
                 <div id="selectedItems"></div>
                 
-                <div class="total-section">
-                    <h3>Total Bottles (30-Day Supply):</h3>
+                <div class="total-section" style="display: none;">
+                    <h3>Total Bottles:</h3>
                     <div class="total-amount" id="totalBottles">0 bottles</div>
                     
                     <div class="pricing-breakdown" id="pricingBreakdown" style="display: none;">
@@ -535,6 +571,10 @@
     <script>
         // Product database with exact PCC dosing and pricing
         const products = {
+            'Restoring Cellular Communication Pathways Program': [
+                { name: 'RCCP Program with CataZyme-7', size: 'Program Kit', type: 'program', price: 380.00, general: 'See program protocol', acute: 'See program protocol', chronic: 'See program protocol', isProgram: true },
+                { name: 'RCCP Program with CataZyme-U', size: 'Program Kit', type: 'program', price: 380.00, general: 'See program protocol', acute: 'See program protocol', chronic: 'See program protocol', isProgram: true }
+            ],
             'Matrix Nutritionals Sprays': [
                 { name: '5-HTP Liposome Spray', size: '2 oz', type: 'spray', price: 36.95, general: '2 sprays 2x/day', acute: '8 sprays 3x/day', chronic: '4 sprays 3x/day' },
                 { name: 'Melatonin Liposome Spray', size: '2 oz', type: 'spray', price: 29.95, general: '3 sprays before bed', acute: '6-12 sprays before bed', chronic: '6 sprays before bed' },
@@ -794,6 +834,11 @@
             const dosingStr = product[dosingLevel];
             if (!dosingStr) return 1;
             
+            // SPECIAL HANDLING FOR PROGRAMS - always 1 kit per phase
+            if (product.type === 'program' || product.isProgram) {
+                return 1;
+            }
+            
             // SPECIAL HANDLING FOR ACUTE WITH (3-5 DAYS) NOTATION
             // Acute = 5 days at acute dose + 25 days at general dose
             if (dosingLevel === 'acute' && dosingStr.includes('(3-5 days)')) {
@@ -931,11 +976,34 @@
                 return acc;
             }, {});
 
+            // Calculate phase totals (separate kits from bottles)
+            const phaseTotals = {};
+            Object.entries(grouped).forEach(([phase, items]) => {
+                phaseTotals[phase] = {
+                    bottles: items.filter(item => item.type !== 'program' && !item.isProgram).reduce((sum, item) => sum + item.bottles, 0),
+                    kits: items.filter(item => item.type === 'program' || item.isProgram).reduce((sum, item) => sum + item.bottles, 0),
+                    cost: items.reduce((sum, item) => sum + item.cost, 0)
+                };
+            });
+
+            // Calculate grand totals
+            const grandTotalBottles = Object.values(phaseTotals).reduce((sum, phase) => sum + phase.bottles, 0);
+            const grandTotalKits = Object.values(phaseTotals).reduce((sum, phase) => sum + phase.kits, 0);
+            const grandTotalCost = Object.values(phaseTotals).reduce((sum, phase) => sum + phase.cost, 0);
+
+            // Helper function to format totals
+            function formatTotals(bottles, kits) {
+                const parts = [];
+                if (kits > 0) parts.push(`${kits} ${kits === 1 ? 'kit' : 'kits'}`);
+                if (bottles > 0) parts.push(`${bottles} ${bottles === 1 ? 'bottle' : 'bottles'}`);
+                return parts.join(', ') || '0 items';
+            }
+
             container.innerHTML = Object.entries(grouped)
                 .sort(([a], [b]) => a - b)
                 .map(([phase, items]) => `
-                    <div style="margin-bottom: 20px;">
-                        <h4 style="color: #1e3c72; margin-bottom: 10px;">Phase ${phase}</h4>
+                    <div style="margin-bottom: 30px; background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <h4 style="color: #1e3c72; margin-bottom: 15px; border-bottom: 2px solid #1e3c72; padding-bottom: 8px;">Phase ${phase}</h4>
                         ${items.map(item => `
                             <div class="selected-item phase-${item.phase}">
                                 <div class="selected-item-header">
@@ -949,13 +1017,48 @@
                                     <strong>Dosing:</strong> ${item.dosing.includes('(3-5 days)') && item.dosingLabel.includes('Acute') 
                                         ? '5 days: ' + item.dosing.replace(' (3-5 days)', '') + '<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;then 25 days: ' + item.general 
                                         : item.dosing} (${item.dosingLabel})<br>
-                                    <strong>Quantity:</strong> ${item.bottles} ${item.bottles === 1 ? 'bottle' : 'bottles'} @ $${item.price.toFixed(2)} = $${item.cost.toFixed(2)}<br>
+                                    <strong>Quantity:</strong> ${item.bottles} ${item.type === 'program' || item.isProgram ? 'kit' : (item.bottles === 1 ? 'bottle' : 'bottles')} @ $${item.price.toFixed(2)} = $${item.cost.toFixed(2)}<br>
                                     <strong>Size:</strong> ${item.size}
                                 </div>
                             </div>
                         `).join('')}
+                        <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #e0e0e0; background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <strong style="color: #1e3c72; font-size: 1.1em;">Phase ${phase} Total:</strong>
+                                <span style="font-size: 1.1em;"><strong>${formatTotals(phaseTotals[phase].bottles, phaseTotals[phase].kits)}</strong></span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <strong style="color: #1e3c72; font-size: 1.1em;">Total Cost:</strong>
+                                <span style="font-size: 1.1em; color: #2e7d32;"><strong>$${phaseTotals[phase].cost.toFixed(2)}</strong></span>
+                            </div>
+                            <div style="text-align: right; font-size: 0.9em; color: #666; font-style: italic; margin-top: 5px;">
+                                30 Day Supply
+                            </div>
+                        </div>
                     </div>
-                `).join('');
+                `).join('') + `
+                <div style="margin-top: 30px; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+                    <h3 style="margin-bottom: 20px; font-size: 1.5em; text-align: center; border-bottom: 2px solid rgba(255,255,255,0.3); padding-bottom: 12px;">
+                        PROTOCOL SUMMARY
+                    </h3>
+                    ${Object.entries(phaseTotals).sort(([a], [b]) => a - b).map(([phase, totals]) => `
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 12px; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 6px;">
+                            <span style="font-size: 1.05em;"><strong>Phase ${phase}:</strong></span>
+                            <span>${formatTotals(totals.bottles, totals.kits)} - $${totals.cost.toFixed(2)}</span>
+                        </div>
+                    `).join('')}
+                    <div style="margin-top: 20px; padding-top: 20px; border-top: 3px solid rgba(255,255,255,0.5);">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <strong style="font-size: 1.3em;">TOTAL:</strong>
+                            <span style="font-size: 1.3em;"><strong>${formatTotals(grandTotalBottles, grandTotalKits)}</strong></span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <strong style="font-size: 1.3em;">TOTAL COST:</strong>
+                            <span style="font-size: 1.3em; color: #81c784;"><strong>$${grandTotalCost.toFixed(2)}</strong></span>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
         function removeProduct(index) {
