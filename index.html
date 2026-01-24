@@ -748,7 +748,7 @@
                 { name: 'Heart\'s Song Milieu Spray', size: '2 oz', type: 'spray', price: 36.95, general: '5 sprays 2x/day', acute: '10 sprays 6x/day', chronic: '10 sprays 2x/day' },
                 { name: 'Kidney Milieu', size: '2 oz', type: 'tincture', price: 30.00, general: '1 dropper 2x/day', acute: '2 droppers 6x/day (3-5 days)', chronic: '2 droppers 2x/day' },
                 { name: 'Liver Milieu', size: '2 oz', type: 'tincture', price: 30.00, general: '1 dropper 2x/day', acute: '2 droppers 6x/day (3-5 days)', chronic: '2 droppers 2x/day' },
-                { name: 'ReHydrate', size: '2 oz', type: 'tincture', price: 30.00, general: '15 drops in every liter of water (Do NOT take sublingually)', acute: 'See General dosing', chronic: 'See General dosing' },
+                { name: 'ReHydrate', size: '2 oz', type: 'tincture', price: 30.00, general: '15 drops in every liter of water (Do NOT take sublingually)', acute: 'Use General dosing', chronic: 'Use General dosing' },
                 { name: 'Relax Milieu', size: '2 oz', type: 'tincture', price: 30.00, general: '1 dropper 2x/day', acute: '2 droppers 6x/day (3-5 days)', chronic: '2 droppers 2x/day' },
                 { name: 'Solace Milieu', size: '2 oz', type: 'tincture', price: 37.00, general: '1 dropper 2x/day', acute: '2 droppers 6x/day (3-5 days)', chronic: '2 droppers 2x/day' },
                 { name: 'Throat Spray Milieu', size: '2 oz', type: 'spray', price: 30.00, general: '5 sprays 2x/day', acute: '10 sprays 6x/day', chronic: '10 sprays 2x/day' }
@@ -893,6 +893,25 @@
             // SPECIAL HANDLING FOR PROGRAMS - always 1 kit per phase
             if (product.type === 'program' || product.isProgram) {
                 return 1;
+            }
+            
+            // SPECIAL HANDLING FOR REHYDRATE - drops per liter of water
+            if (product.name === 'ReHydrate' && dosingStr.includes('liter')) {
+                // ReHydrate: 15 drops in every liter of water
+                // Assume patient drinks 3 liters/day (average)
+                // 15 drops × 3 liters = 45 drops/day
+                // 45 drops ÷ 20 drops/mL = 2.25 mL/day
+                // 2.25 mL × 30 days = 67.5 mL/month
+                // 1 bottle = 60 mL (2 oz)
+                // Result: 67.5 / 60 = 1.125 bottles
+                const dropsMatch = dosingStr.match(/(\d+)\s*drops/i);
+                const dropsPerLiter = dropsMatch ? parseInt(dropsMatch[1]) : 15;
+                const litersPerDay = 3;  // Average water intake
+                const dropsPerDay = dropsPerLiter * litersPerDay;
+                const mlPerDay = dropsPerDay / 20;  // 20 drops = 1 mL
+                const mlPerMonth = mlPerDay * 30;
+                const mlPerBottle = 60;  // 2 oz
+                return Math.ceil(mlPerMonth / mlPerBottle);
             }
             
             // SPECIAL HANDLING FOR ACUTE WITH (3-5 DAYS) NOTATION
