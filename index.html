@@ -171,6 +171,7 @@
             gap: 10px;
             align-items: center;
             margin-top: 10px;
+            flex-wrap: wrap;
         }
         .dosing-controls select {
             flex: 1;
@@ -178,6 +179,27 @@
             border: 2px solid #ddd;
             border-radius: 6px;
             font-size: 14px;
+        }
+        .custom-dosage-input {
+            display: none;
+            width: 100%;
+            padding: 8px 10px;
+            border: 2px solid #f59e0b;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-top: 6px;
+            background: #fffbeb;
+            color: #333;
+            box-sizing: border-box;
+        }
+        .custom-dosage-input:focus {
+            outline: none;
+            border-color: #d97706;
+            background: #fff;
+        }
+        .custom-dosage-input::placeholder {
+            color: #aaa;
+            font-style: italic;
         }
         .search-box {
             width: 100%;
@@ -749,6 +771,7 @@
         function calculateBottles(productName, dosingLevel) {
             const product = Object.values(products).flat().find(p => p.name === productName);
             if (!product) return 1;
+            if (dosingLevel === 'custom' || !product[dosingLevel]) return 1;
             
             const dosing = product[dosingLevel].toLowerCase();
             
@@ -942,6 +965,7 @@
                                 <option value="general">General</option>
                                 <option value="acute">Acute</option>
                                 <option value="chronic">Chronic</option>
+                                <option value="custom">Custom</option>
                             </select>
                             <select class="phase-select" onchange="handlePhaseChange(this, '${category}', '${product.name}')">
                                 <option value="">Select Phase</option>
@@ -950,6 +974,7 @@
                                 <option value="phase3">Phase 3</option>
                                 <option value="phase4">Phase 4</option>
                             </select>
+                            <input type="text" class="custom-dosage-input" placeholder="Enter custom dosage instructions..." oninput="handleCustomDosageInput(this, '${category}', '${product.name}')">
                         </div>
                     `;
                     content.appendChild(productDiv);
@@ -974,7 +999,18 @@
         function handleDosingChange(select, category, productName) {
             const dosingLevel = select.value;
             const phaseSelect = select.parentElement.querySelector('.phase-select');
+            const customInput = select.parentElement.querySelector('.custom-dosage-input');
             const phase = phaseSelect.value;
+
+            // Show/hide custom input
+            if (dosingLevel === 'custom') {
+                customInput.style.display = 'block';
+                customInput.focus();
+                // Don't add to selected yet — wait for text input
+                return;
+            } else {
+                customInput.style.display = 'none';
+            }
 
             if (!dosingLevel || !phase) return;
 
@@ -983,7 +1019,6 @@
 
             const bottles = calculateBottles(productName, dosingLevel);
             const basePrice = pricing[productName] || 0;
-            // Store RETAIL price, not discounted/taxed - that's calculated at display time
             const pricePerBottle = basePrice;
             const totalCost = bottles * pricePerBottle;
 
@@ -994,8 +1029,8 @@
                 dosing: product[dosingLevel],
                 phase: phase,
                 bottles: bottles,
-                pricePerBottle: pricePerBottle,  // Retail price
-                totalCost: totalCost  // Retail subtotal (before discount/tax)
+                pricePerBottle: pricePerBottle,
+                totalCost: totalCost
             };
 
             if (existingIndex >= 0) {
@@ -1008,19 +1043,60 @@
             select.closest('.product-item').classList.add('selected');
         }
 
+        function handleCustomDosageInput(input, category, productName) {
+            const customText = input.value.trim();
+            const phaseSelect = input.parentElement.querySelector('.phase-select');
+            const phase = phaseSelect.value;
+
+            if (!customText || !phase) return;
+
+            const existingIndex = selectedProducts.findIndex(p => p.name === productName);
+            const basePrice = pricing[productName] || 0;
+
+            const selectedProduct = {
+                name: productName,
+                category: category,
+                dosingLevel: 'custom',
+                dosing: customText,
+                phase: phase,
+                bottles: 1,
+                pricePerBottle: basePrice,
+                totalCost: basePrice
+            };
+
+            if (existingIndex >= 0) {
+                selectedProducts[existingIndex] = selectedProduct;
+            } else {
+                selectedProducts.push(selectedProduct);
+            }
+
+            renderSelectedProducts();
+            input.closest('.product-item').classList.add('selected');
+        }
+
         function handlePhaseChange(select, category, productName) {
             const dosingSelect = select.parentElement.querySelector('.dosing-select');
+            const customInput = select.parentElement.querySelector('.custom-dosage-input');
             const dosingLevel = dosingSelect.value;
             const phase = select.value;
 
             if (!dosingLevel || !phase) return;
 
-            const product = products[category].find(p => p.name === productName);
-            const existingIndex = selectedProducts.findIndex(p => p.name === productName);
-
-            const bottles = calculateBottles(productName, dosingLevel);
             const basePrice = pricing[productName] || 0;
-            // Store RETAIL price, not discounted/taxed
+
+            let dosing, bottles;
+            if (dosingLevel === 'custom') {
+                const customText = customInput.value.trim();
+                if (!customText) return;
+                dosing = customText;
+                bottles = 1;
+            } else {
+                const product = products[category].find(p => p.name === productName);
+                dosing = product[dosingLevel];
+                bottles = calculateBottles(productName, dosingLevel);
+            }
+
+            const existingIndex = selectedProducts.findIndex(p => p.name === productName);
             const pricePerBottle = basePrice;
             const totalCost = bottles * pricePerBottle;
 
@@ -1028,11 +1104,11 @@
                 name: productName,
                 category: category,
                 dosingLevel: dosingLevel,
-                dosing: product[dosingLevel],
+                dosing: dosing,
                 phase: phase,
                 bottles: bottles,
-                pricePerBottle: pricePerBottle,  // Retail price
-                totalCost: totalCost  // Retail subtotal
+                pricePerBottle: pricePerBottle,
+                totalCost: totalCost
             };
 
             if (existingIndex >= 0) {
@@ -1094,7 +1170,7 @@
                                 <button class="remove-btn" onclick="removeProduct('${product.name}')">Remove</button>
                             </div>
                             <div class="dosing-info">
-                                <strong>${product.dosingLevel.charAt(0).toUpperCase() + product.dosingLevel.slice(1)} Protocol:</strong> ${product.dosing}
+                                <strong>${product.dosingLevel === 'custom' ? '⚙️ Custom Protocol:' : product.dosingLevel.charAt(0).toUpperCase() + product.dosingLevel.slice(1) + ' Protocol:'}</strong> ${product.dosing}
                             </div>
                             <div class="pricing-info">
                                 ${product.bottles} bottle${product.bottles > 1 ? 's' : ''} × $${product.pricePerBottle.toFixed(2)} = $${product.totalCost.toFixed(2)}
@@ -1383,7 +1459,7 @@
                                     <div class="phase-badge">${phaseLabels[phase]}</div>
                                 </div>
                                 <div class="product-details">
-                                    <strong>Dosing:</strong> ${product.dosing}<br>
+                                    <strong>${product.dosingLevel === 'custom' ? '⚙️ Custom Protocol' : product.dosingLevel.charAt(0).toUpperCase() + product.dosingLevel.slice(1) + ' Protocol'}:</strong> ${product.dosing}<br>
                                     <strong>Quantity:</strong> ${product.bottles} bottle${product.bottles > 1 ? 's' : ''} @ $${product.pricePerBottle.toFixed(2)} = $${product.totalCost.toFixed(2)}<br>
                                     <strong>Size:</strong> 2 oz
                                 </div>
