@@ -203,6 +203,7 @@
         .selected-item.phase2 { border-left-color: #2196f3; }
         .selected-item.phase3 { border-left-color: #ff9800; }
         .selected-item.phase4 { border-left-color: #9c27b0; }
+        .selected-item.phase5 { border-left-color: #e91e63; }
         .selected-item-header {
             display: flex;
             justify-content: space-between;
@@ -255,6 +256,7 @@
         .phase-badge.phase2 { background: #2196f3; }
         .phase-badge.phase3 { background: #ff9800; }
         .phase-badge.phase4 { background: #9c27b0; }
+        .phase-badge.phase5 { background: #e91e63; }
         .notes-section {
             background: white;
             padding: 20px;
@@ -328,23 +330,14 @@
             .product-panel { display: none; }
             .action-buttons { display: none; }
             .selected-panel { max-height: none; }
-            .header {
-                background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                color: white !important;
+            .logo { width: 150px; }
+            .header { 
+                background: white !important; 
+                color: #000 !important;
+                border: 3px solid #000 !important;
             }
             .header h1, .header p {
-                color: white !important;
-            }
-            .logo {
-                width: 150px !important;
-                display: block !important;
-                visibility: visible !important;
-            }
-            .logo-container {
-                display: flex !important;
-                visibility: visible !important;
+                color: #000 !important;
             }
             @page { margin: 0.75in; }
         }
@@ -390,6 +383,38 @@
                 </div>
 
                 <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search products...">
+
+                <div class="patient-info" style="margin-bottom: 20px;">
+                    <h3>Add Custom Supplement</h3>
+                    <div class="form-group">
+                        <label>Supplement Name:</label>
+                        <input type="text" id="customSupplementName" placeholder="Enter supplement name">
+                    </div>
+                    <div class="form-group">
+                        <label>Dosing Instructions:</label>
+                        <input type="text" id="customSupplementDosing" placeholder="e.g. 2 capsules 2x daily">
+                    </div>
+                    <div class="form-group">
+                        <label>Price per Bottle ($):</label>
+                        <input type="number" id="customSupplementPrice" min="0" step="0.01" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Bottles (30-day supply):</label>
+                        <input type="number" id="customSupplementBottles" min="1" value="1" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Phase:</label>
+                        <select id="customSupplementPhase" style="width:100%; padding:10px; border:2px solid #ddd; border-radius:6px; font-size:14px;">
+                            <option value="">Select Phase</option>
+                            <option value="phase1">Phase 1</option>
+                            <option value="phase2">Phase 2</option>
+                            <option value="phase3">Phase 3</option>
+                            <option value="phase4">Phase 4</option>
+                            <option value="phase5">Phase 5</option>
+                        </select>
+                    </div>
+                    <button onclick="addCustomSupplement()" style="width:100%; padding:12px; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; border:none; border-radius:8px; font-size:1em; font-weight:600; cursor:pointer; margin-top:5px;">Add Custom Supplement</button>
+                </div>
 
                 <div id="categories"></div>
             </div>
@@ -958,6 +983,7 @@
                                 <option value="phase2">Phase 2</option>
                                 <option value="phase3">Phase 3</option>
                                 <option value="phase4">Phase 4</option>
+                                <option value="phase5">Phase 5</option>
                             </select>
                         </div>
                     `;
@@ -1066,7 +1092,8 @@
                 phase1: [],
                 phase2: [],
                 phase3: [],
-                phase4: []
+                phase4: [],
+                phase5: []
             };
 
             selectedProducts.forEach(product => {
@@ -1086,7 +1113,8 @@
                         phase1: 'Phase 1',
                         phase2: 'Phase 2',
                         phase3: 'Phase 3',
-                        phase4: 'Phase 4'
+                        phase4: 'Phase 4',
+                        phase5: 'Phase 5'
                     }[phase];
 
                     const phaseHeader = document.createElement('h3');
@@ -1219,7 +1247,7 @@
                             padding: 40px 40px 30px 40px;
                             border-radius: 10px;
                         }
-                        .logo { width: 160px; height: auto; display: block; margin: 0 auto 15px auto; }
+                        .logo { width: 200px; height: auto; margin-bottom: 15px; }
                         .header h1 { font-size: 2em; margin: 10px 0 5px 0; font-weight: 600; }
                         .header p { font-size: 1em; opacity: 0.95; margin: 5px 0; }
                         .patient-info { 
@@ -1345,19 +1373,6 @@
                         @media print {
                             body { background: white; }
                             .product-item { page-break-inside: avoid; }
-                            .header {
-                                background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
-                                -webkit-print-color-adjust: exact !important;
-                                print-color-adjust: exact !important;
-                                color: white !important;
-                            }
-                            .header h1, .header p { color: white !important; }
-                            .logo {
-                                display: block !important;
-                                visibility: visible !important;
-                                width: 160px !important;
-                                height: auto !important;
-                            }
                         }
                     </style>
                 </head>
@@ -1380,10 +1395,10 @@
                     <p class="note-text">Note: Each phase represents an independent 30-day supply. Phase 1 = 30 days, Phase 2 = 30 days, etc.</p>
             `;
 
-            const byPhase = { phase1: [], phase2: [], phase3: [], phase4: [] };
+            const byPhase = { phase1: [], phase2: [], phase3: [], phase4: [], phase5: [] };
             selectedProducts.forEach(product => { byPhase[product.phase].push(product); });
 
-            const phaseLabels = { phase1: 'Phase 1', phase2: 'Phase 2', phase3: 'Phase 3', phase4: 'Phase 4' };
+            const phaseLabels = { phase1: 'Phase 1', phase2: 'Phase 2', phase3: 'Phase 3', phase4: 'Phase 4', phase5: 'Phase 5' };
             const phaseTotals = {};
 
             // Generate product listings by phase
@@ -1475,6 +1490,45 @@
             reportWindow.document.close();
             reportWindow.print();
         }
+        function addCustomSupplement() {
+            const name = document.getElementById('customSupplementName').value.trim();
+            const dosing = document.getElementById('customSupplementDosing').value.trim();
+            const price = parseFloat(document.getElementById('customSupplementPrice').value) || 0;
+            const bottles = parseInt(document.getElementById('customSupplementBottles').value) || 1;
+            const phase = document.getElementById('customSupplementPhase').value;
+
+            if (!name) { alert('Please enter a supplement name.'); return; }
+            if (!phase) { alert('Please select a phase.'); return; }
+
+            const existingIndex = selectedProducts.findIndex(p => p.name === name && p.isCustom);
+            const selectedProduct = {
+                name: name,
+                category: 'Custom',
+                dosingLevel: 'custom',
+                dosing: dosing || 'As directed',
+                phase: phase,
+                bottles: bottles,
+                pricePerBottle: price,
+                totalCost: bottles * price,
+                isCustom: true
+            };
+
+            if (existingIndex >= 0) {
+                selectedProducts[existingIndex] = selectedProduct;
+            } else {
+                selectedProducts.push(selectedProduct);
+            }
+
+            renderSelectedProducts();
+
+            // Clear inputs
+            document.getElementById('customSupplementName').value = '';
+            document.getElementById('customSupplementDosing').value = '';
+            document.getElementById('customSupplementPrice').value = '';
+            document.getElementById('customSupplementBottles').value = '1';
+            document.getElementById('customSupplementPhase').value = '';
+        }
+
         function clearAll() {
             if (confirm('Are you sure you want to clear all selections?')) {
                 selectedProducts = [];
